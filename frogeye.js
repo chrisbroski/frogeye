@@ -1,40 +1,58 @@
 var util = require('util'),
     spawn = require('child_process').spawn,
-    cam = spawn('raspiyuv', ['-w', '64', '-h', '48', '-tl', '500', '-o', '-']),
-    lastImage = [];
+    imgWidth = 64,
+    imgHeight = 48,
+    imgPixelSize = imgWidth * imgHeight,
+    imgRawFileSize = imgPixelSize * 1.5,
+    timeLapseInterval = 500; // in milliseconds
 
-cam.stdout.on('data', function (data) {
-    var thisImage = [],
-        ii,
-        diff,
-        movement = 0;
+function frames() {
+    var cam = spawn('raspiyuv', [
+            '-w', imgWidth.toString(10),
+            '-h', imgHeight.toString(10),
+            '-tl', timeLapseInterval.toString(10),
+            '-t', '300000', // Restart every 5 min
+            '-o', '-' // To stdout
+        ]),
+        lastImage = [];
 
-    if (data.length !== 4608) {
-        console.log('image incorrect size');
-        return;
-    }
-    for (ii = 0; ii < 3072; ii += 1) {
-        thisImage.push(data.readUInt8(ii));
-    }
+    console.log('Initializing time lapse image capture to stdout.');
 
-    if (lastImage.length) {
-        for (ii = 0; ii < 3072; ii += 1) {
-            diff = lastImage[ii] - thisImage[ii];
-            if (diff > 50 || diff < -50) {
-                movement += 1;
+    cam.stdout.on('data', function (data) {
+        var thisImage = [],
+            ii,
+            diff,
+            movement = 0;
+
+        if (data.length < imgRawFileSize - 1) {
+            console.log('image incorrect size');
+            return;
+        }
+        for (ii = 0; ii < imgPixelSize; ii += 1) {
+            thisImage.push(data.readUInt8(ii));
+        }
+
+        if (lastImage.length) {
+            for (ii = 0; ii < imgPixelSize; ii += 1) {
+                diff = lastImage[ii] - thisImage[ii];
+                if (diff > 50 || diff < -50) {
+                    movement += 1;
+                }
             }
         }
-    }
 
-    lastImage = thisImage;
-    console.log('move:', movement);
-});
+        lastImage = thisImage;
+        console.log('move:', movement);
+    });
 
-cam.stderr.on('data', function (data) {
-    console.log('stderr: ' + data);
-});
+    cam.stderr.on('data', function (data) {
+        console.log('stderr: ' + data);
+    });
 
-cam.on('exit', function (code) {
-    console.log('child process exited with code ' + code);
+    cam.on('exit', function (code) {
+        console.log('child process exited with code ' + code);
+        frames();
+    });
+}
 
-});
+frames();
