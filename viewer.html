@@ -1,15 +1,8 @@
 <!doctype html>
 <title>Frogeye Viewer</title>
-<style>
-#frogview {width: 800px; float: left; }
-table {border-collapse: collapse;}
-td {width: 9px; height: 9px; border: 1px solid #000; }
-</style>
 
 <article>
 <h1>Frogeye Viewer</h1>
-
-<div id="frogview"></div>
 
 <h3>Sense State</h3>
 <pre id="senseState"></pre>
@@ -19,31 +12,12 @@ td {width: 9px; height: 9px; border: 1px solid #000; }
 
 var socket;
 
-function createViewerTable() {
-    var tbl = document.createElement('table'),
-        x,
-        xLen = 64,
-        y,
-        yLen = 48,
-        row,
-        cell;
-
-    for (y = 0; y < yLen; y += 1) {
-        row = tbl.insertRow();
-        for (x = 0; x < xLen; x += 1) {
-            cell = row.insertCell();
-            cell.id = 'fe' + x + '-' + y;
-        }
-    }
-    document.getElementById('frogview').appendChild(tbl);
-}
-
 function init() {
-    createViewerTable();
     socket = io();
     socket.on('senseState', function(msg) {
-        var jsonState = JSON.stringify(JSON.parse(msg), null, '    ');
-        document.getElementById('senseState').innerHTML = jsonState;
+        var jsonState = JSON.parse(msg);
+        var jsonString = JSON.stringify(jsonState, null, '    ');
+        document.getElementById('senseState').innerHTML = jsonString;
     });
 }
 

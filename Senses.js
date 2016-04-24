@@ -1,6 +1,6 @@
 /*jslint node: true */
 
-function Senses(imgWidth, imgHeight) {
+function Senses(visionWidth, visionHeight) {
     'use strict';
 
     // Import libraries
@@ -20,13 +20,14 @@ function Senses(imgWidth, imgHeight) {
             lumaPrevious: []
         },
 
-        // *perceptions* are results of processing raw sensory data
+        // *perceptions* are results of processing the raw sensory data
         perceptions: {
-            overallMotion: 0
+            motionOverall: 0,
+            motionDirection: 'none'
         }
     };
 
-    // Sense state is readable (but not changeable) by any part of a behavioral logic system.
+    // Sense state is publically readable (but not changeable).
     this.senseState = function senseState(type) {
         if (type) {
             return JSON.parse(JSON.stringify(state.perceptions[type]));
@@ -36,20 +37,39 @@ function Senses(imgWidth, imgHeight) {
 
     // Perceivers process raw sense state into meaningful information
     perceivers.overallMotion = function overallMotion(imgPixelSize) {
-        var diff, ii, changeAmount = 50, movement = 0;
+        var diff, ii, changeAmount = 20, movement = 0, directions = [0, 0, 0];
         // This needs optimization - change to first image flag or something
         if (state.raw.lumaPrevious.length) {
-            // Compare current and previous brightness arrays
+            // Compare current and previous luma arrays
             for (ii = 0; ii < imgPixelSize; ii += 1) {
-                diff = state.raw.lumaPrevious[ii] - state.raw.lumaCurrent[ii];
-                if (diff > changeAmount || diff < changeAmount * -1) {
+                diff = Math.abs(state.raw.lumaPrevious[ii] - state.raw.lumaCurrent[ii]);
+                if (diff > changeAmount) {// || diff < changeAmount * -1) {
                     movement += 1;
+
+                    if (ii % 64 < 24) {
+                        directions[0] = directions[0] + 1;
+                    } else if (ii % 64 >= 40) {
+                        directions[2] = directions[2] + 1;
+                    } else {
+                        directions[1] = directions[1] + 1;
+                    }
                 }
             }
         }
 
-        state.perceptions.overallMotion = movement;
-        console.log('move:', movement);
+        state.perceptions.motionOverall = movement;
+        if (movement > 20) {
+            if (directions[0] > directions[1] && directions[0] > directions[2]) {
+                state.perceptions.motionDirection = 'left';
+            } else if (directions[2] > directions[1] && directions[2] > directions[0]) {
+                state.perceptions.motionDirection = 'right';
+            } else {
+                state.perceptions.motionDirection = 'center';
+            }
+        } else {
+            state.perceptions.motionDirection = 'none';
+        }
+
     };
 
     // *Observers* receive data from a creature's sensors, then update sense state
@@ -73,15 +93,17 @@ function Senses(imgWidth, imgHeight) {
         perceivers.overallMotion(imgPixelSize);
     };
 
-    // *Attention control* is responsible for triggering observers and perceivers appropriately.
+    // *Attention control* is responsible for triggering observers and perceivers.
     attention.control = {};
     attention.control.look = function look(timeLapseInterval) {
-        var imgPixelSize = imgWidth * imgHeight,
+        var imgPixelSize = visionWidth * visionHeight,
             imgRawFileSize = imgPixelSize * 1.5,
 
             cam = spawn('raspiyuv', [
-                '-w', imgWidth.toString(10),
-                '-h', imgHeight.toString(10),
+                '-w', visionWidth.toString(10),
+                '-h', visionHeight.toString(10),
+                '-vf',
+                '-vf',
                 '-tl', timeLapseInterval.toString(10),
                 '-t', '300000', // Restart every 5 min
                 '-o', '-' // To stdout
@@ -90,29 +112,24 @@ function Senses(imgWidth, imgHeight) {
         cam.stdout.on('data', function (data) {
             observers.luma(data, imgRawFileSize, imgPixelSize);
         });
+
         cam.stderr.on('data', function (data) {
             console.log('stderr: ' + data);
         });
 
         cam.on('exit', function (code) {
-            console.log('child process exited with code ' + code);
-            console.log('Restarting time lapse');
-            attention.control.look();
+            console.log('raspiyuv process exited with code ' + code);
+            console.log('Restarting raspiyuv time lapse');
+            attention.control.look(500);
         });
     };
 
     function init() {
+        console.log('init');
         attention.control.look(500);
     }
 
     init();
-    /*attention.control = function control(type) {
-        if (observers[type]) {
-            observers[type]();
-            return true;
-        }
-        return false;
-    };*/
 }
 
 module.exports = Senses;

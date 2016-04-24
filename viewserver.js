@@ -3,6 +3,7 @@
 var app = require('express')(),
     http = require('http').Server(app),
     io = require('socket.io')(http),
+    port = 3789,
     Senses = require('./Senses.js'),
     senses = new Senses(64, 48);
 
@@ -18,15 +19,15 @@ function sendSenseData() {
 }
 
 io.on('connection', function (socket) {
-    console.log('a user connected');
+    console.log('viewer connected');
 
     sendSenseData();
 
     socket.on('disconnect', function () {
-        console.log('user disconnected');
+        console.log('viewer disconnected');
     });
 });
 
-http.listen(3000, function () {
-    console.log('listening on *:3000');
+http.listen(port, function () {
+    console.log('listening on /:' + port);
 });
