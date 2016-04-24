@@ -69,7 +69,6 @@ function Senses(visionWidth, visionHeight) {
         } else {
             state.perceptions.motionDirection = 'none';
         }
-
     };
 
     // *Observers* receive data from a creature's sensors, then update sense state
@@ -78,7 +77,7 @@ function Senses(visionWidth, visionHeight) {
             ii;
 
         if (yuvData.length < imgRawFileSize - 1) {
-            console.log('image incorrect size');
+            console.log('image incorrect file size');
             return;
         }
 

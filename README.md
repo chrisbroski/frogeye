@@ -4,7 +4,24 @@ Making a camera tell a computer what a frog sees
 
 I discovered the 1959 seminal paper "[What a Frog's Eye Tells a Frog's Brain](http://neuromajor.ucr.edu/courses/WhatTheFrogsEyeTellsTheFrogsBrain.pdf)" in a [Nautilus article on Walter Pitts](http://nautil.us/issue/21/information/the-man-who-tried-to-redeem-the-world-with-logic) Mind == Blown. Not only was Walter a fascinating person, but the results of the frog eye study jibed with [my own work on AI](http://behaviorallogic.com/foundation). The powerful simplicity of image processing in a frog's retina inspired me to try and build a simulation.
 
-I could go on and on about the paper and its implications, but I'll restrain myself and get to explaining the project.
+The gist of the paper is that we probably think the eye works like a camera:
+
+<img src="img/retina1.png" alt="camera eye">
+
+Light-sensitive cells send a "picture" back to the brain to be analyzed. But when anatomists first dissected vertebrate eyeballs, the structure of the retina was more like this:
+
+<img src="img/retina2.png" alt="intermediate processing">
+
+There was an intermediate layer of cells between the light-detecting ones and the optic nerves. What were these doing? Jerome Lettvin's experiment was designed to find out. He recorded the signals from  electrodes in the nerves of the different intermediate cells while he showed pictures to the frogs.
+
+What he discovered was that this middle layer of cells was doing significant visual processing. Among the types of visual analysis found were:
+
+* On/off - These cells signaled if something in an area changed from light to dark or dark to light indicating movement.
+* Dimmer - These cells fired when a large portion of the visible are go suddenly darker.
+* Edge - These cells recognized areas with high contrast.
+* "Bug" - These cells fired when they detected small, round, moving objects.
+
+The frog's brain didn't need to makes sense of the world at all. The intermediate retinal cells handled this in a very hard-wired way. This looks nothing like a neural net.
 
 ## Hardware
 
@@ -25,6 +42,21 @@ I recommend getting started with Node.js and Raspberry Pi with this [AdaFruit tu
 ### [Atom.io](http://atom.io/)
 
 I am using GitHub's Atom.io code editor on Mac to write the JavaScript. I recommend the [remote-atom](https://atom.io/packages/remote-atom) plugin to easily sync the code files to the Raspberry Pi.
+
+## Accomplishments So Far
+
+I decided to work try and simulate on/off (movement) cells first. The file *overall-movement.js* is a simple processor to measure the total movement in the field of vision.
+
+The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server sends perception information to the HTML page using the [Socket.io](http://socket.io/) library.
+
+*Senses.js* is a constructor for the central organization of all sensory processing. It is built according to [my AI architecture]() to have 4 main sections:
+
+1. **Observers** to collect raw sensory data
+2. **Perceivers** to analyze raw observer data
+3. **Attention** to control when observers and perceivers run
+4. **Sense State** to organize and share perception information
+
+The *Senses.js* module detects total motion (implemented from *motion-overall.js*) and the direction of the side with the most activity (left, right, center, and none.)
 
 ### Reverse-Engineering the YUV Image Format
 

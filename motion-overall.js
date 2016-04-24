@@ -25,7 +25,7 @@ function startTimeLapseCapture() {
             movement = 0;
 
         if (data.length < imgRawFileSize - 1) {
-            console.log('image incorrect size');
+            console.log('image incorrect file size');
             return;
         }
 
