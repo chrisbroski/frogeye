@@ -4,9 +4,10 @@ var util = require('util'),
     imgHeight = 48,
     imgPixelSize = imgWidth * imgHeight,
     imgRawFileSize = imgPixelSize * 1.5,
-    timeLapseInterval = 500; // in milliseconds
+    timeLapseInterval = 500, // in milliseconds
+    changeAmount = 50; // Value difference to be considered changed
 
-function frames() {
+function startTimeLapseCapture() {
     var cam = spawn('raspiyuv', [
             '-w', imgWidth.toString(10),
             '-h', imgHeight.toString(10),
@@ -28,14 +29,17 @@ function frames() {
             console.log('image incorrect size');
             return;
         }
+
+        // Build array of brightness data from first 2/3 of binary buffer
         for (ii = 0; ii < imgPixelSize; ii += 1) {
             thisImage.push(data.readUInt8(ii));
         }
 
         if (lastImage.length) {
+            // Compare current and previous brightness arrays
             for (ii = 0; ii < imgPixelSize; ii += 1) {
                 diff = lastImage[ii] - thisImage[ii];
-                if (diff > 50 || diff < -50) {
+                if (diff > changeAmount || diff < changeAmount * -1) {
                     movement += 1;
                 }
             }
@@ -51,8 +55,9 @@ function frames() {
 
     cam.on('exit', function (code) {
         console.log('child process exited with code ' + code);
-        frames();
+        console.log('Restarting time lapse');
+        startTimeLapseCapture();
     });
 }
 
-frames();
+startTimeLapseCapture();
