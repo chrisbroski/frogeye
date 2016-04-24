@@ -1,6 +1,7 @@
 <!doctype html>
 <title>Frogeye Viewer</title>
 <style>
+#frogview {width: 800px; float: left; }
 table {border-collapse: collapse;}
 td {width: 9px; height: 9px; border: 1px solid #000; }
 </style>
@@ -10,7 +11,8 @@ td {width: 9px; height: 9px; border: 1px solid #000; }
 
 <div id="frogview"></div>
 
-<p>Motion: <span id="motion"></span>
+<h3>Sense State</h3>
+<pre id="senseState"></pre>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -39,8 +41,9 @@ function createViewerTable() {
 function init() {
     createViewerTable();
     socket = io();
-    socket.on('motion', function(msg) {
-        document.getElementById('motion').innerHTML = msg;
+    socket.on('senseState', function(msg) {
+        var jsonState = JSON.stringify(JSON.parse(msg), null, '    ');
+        document.getElementById('senseState').innerHTML = jsonState;
     });
 }
 

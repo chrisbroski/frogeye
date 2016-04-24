@@ -1,5 +1,4 @@
-var util = require('util'),
-    spawn = require('child_process').spawn,
+var spawn = require('child_process').spawn,
     imgWidth = 64,
     imgHeight = 48,
     imgPixelSize = imgWidth * imgHeight,
