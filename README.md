@@ -2,7 +2,7 @@
 
 Making a camera tell a computer what a frog sees
 
-I discovered the 1959 seminal paper "[What a Frog's Eye Tells a Frog's Brain](http://neuromajor.ucr.edu/courses/WhatTheFrogsEyeTellsTheFrogsBrain.pdf)" in a [Nautilus article on Walter Pitts](http://nautil.us/issue/21/information/the-man-who-tried-to-redeem-the-world-with-logic) Mind === Blown. Not only was Walter a fascinating person, but the results of the frog eye study jibed with [my own work on AI](http://behaviorallogic.com/foundation). The powerful simplicity of image processing in a frog's retina inspired me to try and build a simulation.
+I discovered the 1959 seminal paper "[What a Frog's Eye Tells a Frog's Brain](http://neuromajor.ucr.edu/courses/WhatTheFrogsEyeTellsTheFrogsBrain.pdf)" in a [Nautilus article on Walter Pitts](http://nautil.us/issue/21/information/the-man-who-tried-to-redeem-the-world-with-logic) Mind == Blown. Not only was Walter a fascinating person, but the results of the frog eye study jibed with [my own work on AI](http://behaviorallogic.com/foundation). The powerful simplicity of image processing in a frog's retina inspired me to try and build a simulation.
 
 I could go on and on about the paper and its implications, but I'll restrain myself and get to explaining the project.
 
@@ -24,18 +24,18 @@ I recommend getting started with Node.js and Raspberry Pi with this [AdaFruit tu
 
 ### [Atom.io](http://atom.io/)
 
-I am using this code editor on Mac to write the JavaScript. I also recommend the [remote-atom](https://atom.io/packages/remote-atom) plugin to sync the code files to the Raspberry Pi.
+I am using GitHub's Atom.io code editor on Mac to write the JavaScript. I recommend the [remote-atom](https://atom.io/packages/remote-atom) plugin to easily sync the code files to the Raspberry Pi.
 
-### Reverse-Engineering the Raw Image Format
+### Reverse-Engineering the YUV Image Format
 
-The Raspberry Pi camera can output uncompressed files that are easier to work with than JPEGs, once you know what all the ones and zeros mean. I used Hex Fiend to edit the raw files, then converted them to JPEG with ImageMagick to see what the effect was.
+The Raspberry Pi camera can output uncompressed files in [YUV format](https://en.wikipedia.org/wiki/YUV) that are easier to analyze with than JPEGs, once you know what all the ones and zeros mean. I had some fun using [Hex Fiend](http://ridiculousfish.com/hexfiend/) to edit the raw files, then converted them to JPEG with [ImageMagick](http://www.imagemagick.org/script/index.php) to view the effects.
 
-#### ImageMagick
+#### [ImageMagick](http://www.imagemagick.org/script/index.php)
 
-I use ImageMagick to convert from the Raspberry Pi unprocessed image data to something viewable to help reverse-engineer the raw format. I installed using the Homebrew package.
+I use ImageMagick to convert YUV image data to something viewable to aid in reverse-engineering the raw format. I installed using the Homebrew package.
 
     convert -size "64x48" -depth 8 yuv:test.raw conv.jpg
 
-#### Hex Fiend
+#### [Hex Fiend](http://ridiculousfish.com/hexfiend/)
 
 This hex editor seems to work fine on OSX. Installed with Homebrew.

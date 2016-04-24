@@ -1,24 +1,33 @@
-/*var io = require('socket.io')();
-io.on('connection', function(socket) {
-    console.log('connect');
-    var i = 0;
-    setTimeout(function () {
-        io.send(i);
-        i += 1;
-    }, 3000);
+/*jslint node: true */
+
+var app = require('express')(),
+    http = require('http').Server(app),
+    io = require('socket.io')(http),
+    port = 3789,
+    Senses = require('./Senses.js'),
+    senses = new Senses(64, 48);
+
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/viewer.html');
 });
-*/
-var http = require('http');
-var server = http.createServer();
-var io = require('socket.io')(server);
-io.on('connection', function(socket){
-    socket.on('event', function(data){});
-    socket.on('disconnect', function(){});
-    console.log('connect');
-    var i = 0;
-    setTimeout(function () {
-        io.send(i);
-        i += 1;
-    }, 3000);
+
+function sendSenseData() {
+    setInterval(function () {
+        // send sense data to viewer
+        io.emit('senseState', JSON.stringify(senses.senseState()));
+    }, 100);
+}
+
+io.on('connection', function (socket) {
+    console.log('viewer connected');
+
+    sendSenseData();
+
+    socket.on('disconnect', function () {
+        console.log('viewer disconnected');
+    });
 });
-server.listen(3000);
+
+http.listen(port, function () {
+    console.log('listening on /:' + port);
+});
