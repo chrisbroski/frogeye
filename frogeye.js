@@ -1,6 +1,6 @@
 /*jslint node: true */
 
-function getMotionDirection(movement, dir) {
+function motionDirection(movement, dir) {
     if (movement > 20) {
         if (dir[0] > dir[1] && dir[0] > dir[2]) {
             return 'left';
@@ -14,23 +14,25 @@ function getMotionDirection(movement, dir) {
 }
 
 function lrOrCenter(ii, visionWidth) {
-    var left = visionWidth / 2.67,
+    var left = visionWidth * 0.375,
         right;
 
     if (ii % visionWidth < left) {
         return 0;
     }
-    right = visionWidth / 1.6;
+
+    right = visionWidth * 0.625;
     if (ii % visionWidth > right) {
         return 2;
     }
+
     return 1;
 }
 
 function frogeye(imgPixelSize, visionWidth, luma, changeAmount) {
     var diff, ii, movement = 0, directions = [0, 0, 0], brightness = 0;
 
-    // This needs optimization - change to first image flag or something
+    // This could be optimized with a first image flag
     if (luma.previous.length) {
         // Compare current and previous luma arrays
         for (ii = 0; ii < imgPixelSize; ii += 1) {
@@ -46,7 +48,7 @@ function frogeye(imgPixelSize, visionWidth, luma, changeAmount) {
     return {
         "movement": movement / imgPixelSize,
         "brightness": brightness / imgPixelSize,
-        "direction": getMotionDirection(movement, directions)
+        "direction": motionDirection(movement, directions)
     };
 }
 

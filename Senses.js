@@ -13,9 +13,10 @@ function Senses(visionWidth, visionHeight) {
         perceivers = {},
         attention = {};
 
-    // *Sense state* is a collection of all sensory data from the most recent observations
+    // *Sense state* is a collection of all current sensory data.
     state = {
-        // *raw* is unprocessed environment measurements received from sensors
+        // *Raw* state is unprocessed environment measurements received from sensors.
+        // Raw state can only be written by observers and only read by perceivers
         raw: {
             luma: {
                 current: [],
@@ -23,7 +24,8 @@ function Senses(visionWidth, visionHeight) {
             }
         },
 
-        // *perceptions* are results of processing the raw sensory data
+        // *Perceptions* are the results of processing raw sensory data
+        // They can only be written to by perceivers, but can be read by everthing
         perceptions: {
             motionOverall: 0,
             motionDirection: 'none',
@@ -35,15 +37,15 @@ function Senses(visionWidth, visionHeight) {
     };
 
     // Sense state is publically readable (but not changeable).
-    this.senseState = function senseState(type) {
+    this.senseState = function (type) {
         if (type) {
             return JSON.parse(JSON.stringify(state.perceptions[type]));
         }
         return JSON.parse(JSON.stringify(state.perceptions));
     };
 
-    // Perceivers process raw sense state into meaningful information
-    perceivers.overallMotion = function overallMotion(imgPixelSize) {
+    // *Perceivers* process raw sense state into meaningful information
+    perceivers.frogEye = function (imgPixelSize) {
         var frogView = frogeye(imgPixelSize, visionWidth, state.raw.luma, 20);
 
         state.perceptions.motionOverall = frogView.movement;
@@ -51,30 +53,38 @@ function Senses(visionWidth, visionHeight) {
         state.perceptions.motionDirection = frogView.direction;
     };
 
-    // *Observers* receive data from a creature's sensors, then update sense state
-    observers.luma = function luma(yuvData, imgRawFileSize, imgPixelSize) {
+    // *Observers* populate raw sense state from a creature's sensors.
+    observers.luma = function (yuvData, imgRawFileSize, imgPixelSize) {
         var lumaData = [],
             ii;
 
+        // Sensor data validation, if needed
         if (yuvData.length < imgRawFileSize - 1) {
             console.log('Incorrect image file size');
             return;
         }
 
-        // Build array of brightness data from first 2/3 of binary buffer
+        // Data conversion. In this case an array is built from part of a binary buffer.
         for (ii = 0; ii < imgPixelSize; ii += 1) {
             lumaData.push(yuvData.readUInt8(ii));
         }
 
+        // Set raw global sense state
         state.raw.luma.previous = state.raw.luma.current;
         state.raw.luma.current = lumaData;
 
-        perceivers.overallMotion(imgPixelSize);
+        /*
+        Perceivers should typically be handled by the attention object, but for simplicity
+        we'll just fire it off after the observer completes.
+        */
+        perceivers.frogEye(imgPixelSize);
     };
 
-    // *Attention control* is responsible for triggering observers and perceivers.
-    attention.control = {};
-    attention.control.look = function look(timeLapseInterval) {
+    // Other observers can be added here for sound, temperature, velocity, smell, whatever.
+
+    // *Attention* is responsible for triggering observers and perceivers.
+    attention = {};
+    attention.look = function (timeLapseInterval) {
         var imgPixelSize = visionWidth * visionHeight,
             imgRawFileSize = imgPixelSize * 1.5,
 
@@ -99,13 +109,13 @@ function Senses(visionWidth, visionHeight) {
         cam.on('exit', function (code) {
             console.log('raspiyuv process exited with code ' + code);
             console.log('Restarting raspiyuv time lapse');
-            attention.control.look(500);
+            attention.look(500);
         });
     };
 
     function init() {
         console.log('init');
-        attention.control.look(500);
+        attention.look(500);
     }
 
     init();
