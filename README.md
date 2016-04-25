@@ -8,7 +8,7 @@ Mind == Blown.
 
 Not only was Walter a fascinating person, but the results of the frog eye study jibed with [my own work on AI](http://behaviorallogic.com/foundation). The powerful simplicity of image processing in a frog's retina inspired me to attempt to build a simulation.
 
-The gist of the paper is that we probably think the eye works like a camera:
+The gist of the paper is that most people probably think that the eye works like a camera:
 
 <img src="img/retina1.png" alt="camera eye">
 
@@ -16,7 +16,7 @@ Light-sensitive cells send a "picture" back to the brain to be analyzed. But whe
 
 <img src="img/retina2.png" alt="intermediate processing">
 
-There was an intermediate layer of cells between the light-detecting ones and the optic nerves. What were these doing? [Jerome Lettvin](https://www.technologyreview.com/s/508376/in-a-frogs-eye/)'s experiment was designed to find out. He recorded the signals from  electrodes in the nerves of the different intermediate cells while he showed pictures to the frogs.
+There was an intermediate layer of cells between the light-detecting ones and the optic nerves. What were these doing? [Jerome Lettvin](https://www.technologyreview.com/s/508376/in-a-frogs-eye/)'s experiment was designed to find out. He recorded the signals from electrodes in the nerves of the different intermediate cells while he showed pictures to the frogs.
 
 What he discovered was that this middle layer of cells was doing significant visual processing. Among the types of visual analysis found were:
 
@@ -25,7 +25,24 @@ What he discovered was that this middle layer of cells was doing significant vis
 * Contrast - These cells recognize edges.
 * "Bug" - These cells send a signal when a small, round, moving object enters the field of view.
 
-The frog's brain didn't need to makes sense of the world at all. The intermediate retinal cells handle this in a very hard-wired way. This looks nothing like a neural net.
+The frog's brain didn't need to makes sense of the world at all. The intermediate retinal cells handle this in a very hard-wired way.
+
+This looks nothing like a neural net. Walter Pitts was arguably the father of neural networks and a co-author of the frog paper. After the paper was published he burned all of his work and drank himself to death.
+
+## Accomplishments So Far
+
+I decided to try to simulate on/off (movement) cells first. The file *overall-movement.js* is a simple processor to measure total movement in the field of vision of a Pi camera.
+
+The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server sends perception information to the HTML page using the [Socket.io](http://socket.io/) library.
+
+*Senses.js* is a module designed to organize all of the sensory processing of an intelligent artifact. It is built according to [my AI architecture](http://behaviorallogic.com/api/spec) to have 4 main sections:
+
+1. **Observers** to collect raw sensory data
+2. **Perceivers** to analyze raw observer data
+3. **Attention** to control when observers and perceivers are active
+4. **Sense State** to organize and share perception information
+
+The *frogeye.js* module currently detects total motion (adapted from *motion-overall.js*,) the direction of greatest movement (left, right, center, and none) and overall brightness.
 
 ## Hardware
 
@@ -46,21 +63,6 @@ I recommend getting started using Node.js on the Raspberry Pi with this [AdaFrui
 ### [Atom.io](http://atom.io/)
 
 I am using GitHub's Atom.io code editor on Mac to write the JavaScript. I recommend the [remote-atom](https://atom.io/packages/remote-atom) plugin to easily sync the code files to the Raspberry Pi.
-
-## Accomplishments So Far
-
-I decided to try to simulate on/off (movement) cells first. The file *overall-movement.js* is a simple processor to measure total movement in the field of vision of a Pi camera.
-
-The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server sends perception information to the HTML page using the [Socket.io](http://socket.io/) library.
-
-*Senses.js* is a module designed to organize all of the sensory processing of an intelligent artifact. It is built according to [my AI architecture](http://behaviorallogic.com/api/spec) to have 4 main sections:
-
-1. **Observers** to collect raw sensory data
-2. **Perceivers** to analyze raw observer data
-3. **Attention** to control when observers and perceivers are active
-4. **Sense State** to organize and share perception information
-
-The *Senses.js* module currently detects total motion (implemented from *motion-overall.js*,) the direction of greatest movement (left, right, center, and none) and overall brightness.
 
 ### Reverse-Engineering the Y'UV Image Format
 
