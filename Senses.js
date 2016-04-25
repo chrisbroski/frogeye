@@ -5,6 +5,7 @@ function Senses(visionWidth, visionHeight) {
 
     // Import libraries
     var spawn = require('child_process').spawn,
+        frogeye = require('./frogeye.js'),
 
         // Declare private objects
         state,
@@ -16,8 +17,10 @@ function Senses(visionWidth, visionHeight) {
     state = {
         // *raw* is unprocessed environment measurements received from sensors
         raw: {
-            lumaCurrent: [],
-            lumaPrevious: []
+            luma: {
+                current: [],
+                previous: []
+            }
         },
 
         // *perceptions* are results of processing the raw sensory data
@@ -40,51 +43,12 @@ function Senses(visionWidth, visionHeight) {
     };
 
     // Perceivers process raw sense state into meaningful information
-    function getMotionDirection(movement, dir) {
-        if (movement > 20) {
-            if (dir[0] > dir[1] && dir[0] > dir[2]) {
-                return 'left';
-            }
-            if (dir[2] > dir[1] && dir[2] > dir[0]) {
-                return 'right';
-            }
-            return 'center';
-        }
-        return 'none';
-    }
-
-    function lrOrCenter(ii) {
-        var left = visionWidth / 2.67,
-            right;
-
-        if (ii % visionWidth < left) {
-            return 0;
-        }
-        right = visionWidth / 1.6
-        if (ii % visionWidth > right) {
-            return 2;
-        }
-        return 1;
-    }
-
     perceivers.overallMotion = function overallMotion(imgPixelSize) {
-        var diff, ii, changeAmount = 20, movement = 0, directions = [0, 0, 0], brightness = 0;
-        // This needs optimization - change to first image flag or something
-        if (state.raw.lumaPrevious.length) {
-            // Compare current and previous luma arrays
-            for (ii = 0; ii < imgPixelSize; ii += 1) {
-                diff = Math.abs(state.raw.lumaPrevious[ii] - state.raw.lumaCurrent[ii]);
-                brightness += state.raw.lumaCurrent[ii];
-                if (diff > changeAmount) {
-                    movement += 1;
-                    directions[lrOrCenter(ii)] += 1;
-                }
-            }
-        }
+        var frogView = frogeye(imgPixelSize, visionWidth, state.raw.luma, 20);
 
-        state.perceptions.motionOverall = movement / imgPixelSize;
-        state.perceptions.brightnessOverall = brightness / imgPixelSize;
-        state.perceptions.motionDirection = getMotionDirection(movement, directions);
+        state.perceptions.motionOverall = frogView.movement;
+        state.perceptions.brightnessOverall = frogView.brightness;
+        state.perceptions.motionDirection = frogView.direction;
     };
 
     // *Observers* receive data from a creature's sensors, then update sense state
@@ -102,8 +66,8 @@ function Senses(visionWidth, visionHeight) {
             lumaData.push(yuvData.readUInt8(ii));
         }
 
-        state.raw.lumaPrevious = state.raw.lumaCurrent;
-        state.raw.lumaCurrent = lumaData;
+        state.raw.luma.previous = state.raw.luma.current;
+        state.raw.luma.current = lumaData;
 
         perceivers.overallMotion(imgPixelSize);
     };
