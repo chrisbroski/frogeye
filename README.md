@@ -2,7 +2,11 @@
 
 Making a camera tell a computer what a frog sees
 
-I discovered the seminal 1959 paper "[What a Frog's Eye Tells a Frog's Brain](http://neuromajor.ucr.edu/courses/WhatTheFrogsEyeTellsTheFrogsBrain.pdf)" in a [Nautilus article on Walter Pitts](http://nautil.us/issue/21/information/the-man-who-tried-to-redeem-the-world-with-logic) Mind == Blown. Not only was Walter a fascinating person, but the results of the frog eye study jibed with [my own work on AI](http://behaviorallogic.com/foundation). The powerful simplicity of image processing in a frog's retina inspired me to try and build a simulation.
+I discovered the seminal 1959 paper "[What a Frog's Eye Tells a Frog's Brain](http://neuromajor.ucr.edu/courses/WhatTheFrogsEyeTellsTheFrogsBrain.pdf)" in a [Nautilus article on Walter Pitts](http://nautil.us/issue/21/information/the-man-who-tried-to-redeem-the-world-with-logic)
+
+Mind == Blown.
+
+Not only was Walter a fascinating person, but the results of the frog eye study jibed with [my own work on AI](http://behaviorallogic.com/foundation). The powerful simplicity of image processing in a frog's retina inspired me to attempt to build a simulation.
 
 The gist of the paper is that we probably think the eye works like a camera:
 
@@ -45,11 +49,11 @@ I am using GitHub's Atom.io code editor on Mac to write the JavaScript. I recomm
 
 ## Accomplishments So Far
 
-I decided to try to simulate on/off (movement) cells first. The file *overall-movement.js* is a simple processor to measure total movement in the field of vision.
+I decided to try to simulate on/off (movement) cells first. The file *overall-movement.js* is a simple processor to measure total movement in the field of vision of a Pi camera.
 
 The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server sends perception information to the HTML page using the [Socket.io](http://socket.io/) library.
 
-*Senses.js* is a constructor for the central organization of all sensory processing. It is built according to [my AI architecture](http://behaviorallogic.com/api/spec) to have 4 main sections:
+*Senses.js* is a module designed to organize all of the sensory processing of an intelligent animal or artifact. It is built according to [my AI architecture](http://behaviorallogic.com/api/spec) to have 4 main sections:
 
 1. **Observers** to collect raw sensory data
 2. **Perceivers** to analyze raw observer data
@@ -58,9 +62,9 @@ The files *viewerserver.js* and *viewer.html* were built to make monitoring the 
 
 The *Senses.js* module detects total motion (implemented from *motion-overall.js*) and the direction of greatest change (left, right, center, and none.)
 
-### Reverse-Engineering the YUV Image Format
+### Reverse-Engineering the Y'UV Image Format
 
-The Raspberry Pi camera can output uncompressed files in [YUV format](https://en.wikipedia.org/wiki/YUV) that are easier to analyze with than JPEGs, once you know what all the ones and zeros mean. I had some fun using [Hex Fiend](http://ridiculousfish.com/hexfiend/) to edit the raw files, then converted them to JPEG with [ImageMagick](http://www.imagemagick.org/script/index.php) to view the effects.
+The Raspberry Pi camera can output uncompressed files in [YUV format](https://en.wikipedia.org/wiki/YUV) that are easier to analyze than JPEGs, once you know what all the ones and zeros mean. I had some fun using [Hex Fiend](http://ridiculousfish.com/hexfiend/) to edit the raw files, then converted them to JPEG with [ImageMagick](http://www.imagemagick.org/script/index.php) to view the effects. The first 2/3 of the file are a simple grayscale bitmap. The last third is color information that I have not quite figured out yet.
 
 #### [ImageMagick](http://www.imagemagick.org/script/index.php)
 
