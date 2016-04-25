@@ -61,7 +61,7 @@ function Senses(visionWidth, visionHeight) {
             return 0;
         }
         right = visionWidth / 1.6
-        if (ii % visionWidth < right) {
+        if (ii % visionWidth > right) {
             return 2;
         }
         return 1;
