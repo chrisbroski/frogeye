@@ -23,8 +23,12 @@ function Senses(visionWidth, visionHeight) {
         // *perceptions* are results of processing the raw sensory data
         perceptions: {
             motionOverall: 0,
-            motionDirection: 'none'
-        }
+            motionDirection: 'none',
+            brightnessOverall: 0
+        },
+
+        // Perceptions have no state. Moods are persistent indicators that expire over time
+        mood: []
     };
 
     // Sense state is publically readable (but not changeable).
@@ -36,14 +40,28 @@ function Senses(visionWidth, visionHeight) {
     };
 
     // Perceivers process raw sense state into meaningful information
+    function getMotionDirection(movement, dir) {
+        if (movement > 20) {
+            if (dir[0] > dir[1] && dir[0] > dir[2]) {
+                return 'left';
+            }
+            if (dir[2] > dir[1] && dir[2] > dir[0]) {
+                return 'right';
+            }
+            return 'center';
+        }
+        return 'none';
+    }
+
     perceivers.overallMotion = function overallMotion(imgPixelSize) {
-        var diff, ii, changeAmount = 20, movement = 0, directions = [0, 0, 0];
+        var diff, ii, changeAmount = 20, movement = 0, directions = [0, 0, 0], brightness = 0;
         // This needs optimization - change to first image flag or something
         if (state.raw.lumaPrevious.length) {
             // Compare current and previous luma arrays
             for (ii = 0; ii < imgPixelSize; ii += 1) {
                 diff = Math.abs(state.raw.lumaPrevious[ii] - state.raw.lumaCurrent[ii]);
-                if (diff > changeAmount) {// || diff < changeAmount * -1) {
+                brightness += state.raw.lumaCurrent[ii];
+                if (diff > changeAmount) {
                     movement += 1;
 
                     if (ii % 64 < 24) {
@@ -58,17 +76,8 @@ function Senses(visionWidth, visionHeight) {
         }
 
         state.perceptions.motionOverall = movement;
-        if (movement > 20) {
-            if (directions[0] > directions[1] && directions[0] > directions[2]) {
-                state.perceptions.motionDirection = 'left';
-            } else if (directions[2] > directions[1] && directions[2] > directions[0]) {
-                state.perceptions.motionDirection = 'right';
-            } else {
-                state.perceptions.motionDirection = 'center';
-            }
-        } else {
-            state.perceptions.motionDirection = 'none';
-        }
+        state.perceptions.brightnessOverall = brightness / imgPixelSize;
+        state.perceptions.motionDirection = getMotionDirection(movement, directions);
     };
 
     // *Observers* receive data from a creature's sensors, then update sense state
@@ -77,7 +86,7 @@ function Senses(visionWidth, visionHeight) {
             ii;
 
         if (yuvData.length < imgRawFileSize - 1) {
-            console.log('image incorrect file size');
+            console.log('Incorrect image file size');
             return;
         }
 
