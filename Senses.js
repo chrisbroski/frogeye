@@ -53,6 +53,20 @@ function Senses(visionWidth, visionHeight) {
         return 'none';
     }
 
+    function lrOrCenter(ii) {
+        var left = visionWidth / 2.67,
+            right;
+
+        if (ii % visionWidth < left) {
+            return 0;
+        }
+        right = visionWidth / 1.6
+        if (ii % visionWidth < right) {
+            return 2;
+        }
+        return 1;
+    }
+
     perceivers.overallMotion = function overallMotion(imgPixelSize) {
         var diff, ii, changeAmount = 20, movement = 0, directions = [0, 0, 0], brightness = 0;
         // This needs optimization - change to first image flag or something
@@ -63,19 +77,12 @@ function Senses(visionWidth, visionHeight) {
                 brightness += state.raw.lumaCurrent[ii];
                 if (diff > changeAmount) {
                     movement += 1;
-
-                    if (ii % 64 < 24) {
-                        directions[0] = directions[0] + 1;
-                    } else if (ii % 64 >= 40) {
-                        directions[2] = directions[2] + 1;
-                    } else {
-                        directions[1] = directions[1] + 1;
-                    }
+                    directions[lrOrCenter(ii)] += 1;
                 }
             }
         }
 
-        state.perceptions.motionOverall = movement;
+        state.perceptions.motionOverall = movement / imgPixelSize;
         state.perceptions.brightnessOverall = brightness / imgPixelSize;
         state.perceptions.motionDirection = getMotionDirection(movement, directions);
     };

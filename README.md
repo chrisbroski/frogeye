@@ -35,9 +35,9 @@ I am using a [Raspberry Pi 2 B](https://www.raspberrypi.org/products/raspberry-p
 
 ### Node.js
 
-Why Node.js? AI programming decades ago was done with high-level languages that utilized functional and declarative programming paradigms. So what are using today? C and Java? What a giant step backward. If we are ever going to make AI programming a practical endeavor, we need to use development tools with abstraction power. What is the best AI programming language today? I doubt any are as good as they could be, but in my opinion based on limited experience: [Erlang OTP](http://erlang.org/doc/) looks promising. A Lisp dialect like [Scheme](http://www.schemers.org/) could be useful. [Python](https://www.python.org/) is adequate and JavaScript is OK. I am not a fan of JavaScript's C-like syntax (curly brace and semicolon litter everywhere) but it implements a lot of functional style paradigms and has a great native data structure (JSON)
+Why Node.js? AI programming decades ago was done with high-level languages that utilized functional and declarative programming paradigms. So what are using today? C and Java? What a giant step backward. If we are ever going to make AI programming a practical endeavor, we need to use development tools with abstraction power. What is the best AI programming language today? I doubt any are as good as they could be, but in my opinion based on limited experience: [Erlang OTP](http://erlang.org/doc/) looks promising. A Lisp dialect like [Scheme](http://www.schemers.org/) could be useful. [Python](https://www.python.org/) is adequate and JavaScript is OK. I am not a fan of JavaScript's C-like syntax (curly brace and semicolon litter everywhere) but it implements a lot of functional paradigms and has a great native data structure (JSON or JavaScript Object Notation.)
 
-Another thing JavaScript has going for it is that it is one of the most popular languages in the world (though for UI development, not AI) so at least budding AI programmers don't have to scale the learning curve of something like Erlang. A few years ago Node.js took the JavaScript engine out of the front-end to build a network application development tool. Node.js improved some of the major warts of front-end JavaScript (notably library module inclusion) and introduced a great way to find and manage libraries: npm - the Node Package Manager. Node.js is a powerful network development tool, allowing for the building of distributed communication systems similar to (but not quite as good as) OTP.
+Another thing JavaScript has going for it is that it is currently one of the most popular languages in the world (though for UI development, not AI) so at least budding AI programmers don't have to scale the learning curve of something like Erlang. A few years ago Node.js took the JavaScript engine out of the front-end to build a network application development tool. Node.js improved some of the major warts of front-end JavaScript (notably library module inclusion) and introduced a great way to find and manage libraries: npm - the Node Package Manager. Node.js is a powerful network development tool, allowing for the building of distributed communication systems similar to (but not quite as good as) OTP.
 
 I am not the only one to use JavaScript for AI and robotics. There is an active community of JavaScript robot enthusiasts called [NodeBots](http://nodebots.io/).
 
@@ -53,14 +53,14 @@ I decided to try to simulate on/off (movement) cells first. The file *overall-mo
 
 The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server sends perception information to the HTML page using the [Socket.io](http://socket.io/) library.
 
-*Senses.js* is a module designed to organize all of the sensory processing of an intelligent animal or artifact. It is built according to [my AI architecture](http://behaviorallogic.com/api/spec) to have 4 main sections:
+*Senses.js* is a module designed to organize all of the sensory processing of an intelligent artifact. It is built according to [my AI architecture](http://behaviorallogic.com/api/spec) to have 4 main sections:
 
 1. **Observers** to collect raw sensory data
 2. **Perceivers** to analyze raw observer data
 3. **Attention** to control when observers and perceivers are active
 4. **Sense State** to organize and share perception information
 
-The *Senses.js* module detects total motion (implemented from *motion-overall.js*) and the direction of greatest change (left, right, center, and none.)
+The *Senses.js* module currently detects total motion (implemented from *motion-overall.js*,) the direction of greatest movement (left, right, center, and none) and overall brightness.
 
 ### Reverse-Engineering the Y'UV Image Format
 
