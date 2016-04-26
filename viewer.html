@@ -1,8 +1,31 @@
 <!doctype html>
 <title>Frogeye Viewer</title>
+<style>
+#frogeye {
+    position: relative;
+    width: 400px; height: 300px;
+    border: 1px solid  #333;
+}
+#frogeye > div, #frogeye canvas {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+}
+</style>
 
 <article>
 <h1>Frogeye Viewer</h1>
+
+<div id="frogeye">
+    <div id="brightness"></div>
+
+    <div id="movement">
+        <div id="left"></div>
+        <div id="center"></div>
+        <div id="right"></div>
+    </div>
+
+    <canvas id="edges" width="400" height="300"></canvas>
+</div>
 
 <h3>Sense State</h3>
 <pre id="senseState"></pre>
@@ -12,12 +35,21 @@
 
 var socket;
 
+function scaleToShade(normalizedBrightness) {
+    var scaleToHex = Math.floor(normalizedBrightness * 16).toString(16);
+    console.log(scaleToHex);
+    //return '#' + Math.floor()
+}
+
 function init() {
     socket = io();
     socket.on('senseState', function(msg) {
         var jsonState = JSON.parse(msg);
         var jsonString = JSON.stringify(jsonState, null, '    ');
         document.getElementById('senseState').innerHTML = jsonString;
+
+        //document.getElementById('brightness').style.backgroundColor = '#000';
+        scaleToShade(normalizedBrightness);
     });
 }
 

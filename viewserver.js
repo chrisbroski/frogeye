@@ -15,7 +15,7 @@ function sendSenseData() {
     setInterval(function () {
         // send sense data to viewer
         io.emit('senseState', JSON.stringify(senses.senseState()));
-    }, 100);
+    }, 500);
 }
 
 io.on('connection', function (socket) {
