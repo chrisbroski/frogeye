@@ -108,8 +108,8 @@ function displayEdges(edges) {
     ctxEdge.clearRect(0, 0, canvasEdge.width, canvasEdge.height);
 
     edges.forEach(function (edge) {
-        var x = edge.i % 64,
-            y = Math.floor(edge.i / 64);
+        var x = edge % 64,
+            y = Math.floor(edge / 64);
 
         ctxEdge.beginPath();
         ctxEdge.moveTo(x * 6.25 - 3.125, y * 6.25);

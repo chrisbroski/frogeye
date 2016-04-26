@@ -98,7 +98,7 @@ function frogeye(imgPixelSize, visionWidth, luma, changeAmount) {
                 hiResDir[highResDirection(ii, visionWidth, imgPixelSize)] += 1;
             }
             if (isEdge(ii, visionWidth, imgPixelSize, luma.current)) {
-                contrast.push({i: ii});
+                contrast.push(ii);
             }
         }
     }
