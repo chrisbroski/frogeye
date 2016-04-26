@@ -19,15 +19,15 @@ function sendSenseData() {
 }
 
 io.on('connection', function (socket) {
-    console.log('viewer connected');
+    console.log('Frogeye viewer client connected');
 
     sendSenseData();
 
     socket.on('disconnect', function () {
-        console.log('viewer disconnected');
+        console.log('Frogeye viewer client disconnected');
     });
 });
 
 http.listen(port, function () {
-    console.log('listening on /:' + port);
+    console.log('Frogeye view server listening on http://0.0.0.0/:' + port);
 });

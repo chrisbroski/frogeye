@@ -28,7 +28,9 @@ function Senses(visionWidth, visionHeight) {
     state.perceptions = {
         motionOverall: 0.0,
         motionDirection: 'none',
-        brightnessOverall: 0.0
+        motionLocation: [],
+        brightnessOverall: 0.0,
+        edges: []
     };
 
     // Perceptions have no persistent state. Moods are indicators that expire over time
@@ -52,6 +54,8 @@ function Senses(visionWidth, visionHeight) {
         state.perceptions.motionOverall = frogView.movement;
         state.perceptions.brightnessOverall = frogView.brightness;
         state.perceptions.motionDirection = frogView.direction;
+        state.perceptions.motionLocation = frogView.moveArea;
+        state.perceptions.edges = frogView.edges;
     };
 
     // *Observers* populate raw sense state from a creature's sensors.

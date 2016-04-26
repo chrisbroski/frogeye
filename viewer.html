@@ -1,14 +1,52 @@
 <!doctype html>
 <title>Frogeye Viewer</title>
 <style>
+* {box-sizing: border-box; }
 #frogeye {
     position: relative;
+    overflow; auto;
     width: 400px; height: 300px;
     border: 1px solid  #333;
+    float: left;
+}
+#state {
+    margin-top: -1em; padding-left: 1em;
+    float: left;
 }
 #frogeye > div, #frogeye canvas {
     position: absolute;
     top: 0; right: 0; bottom: 0; left: 0;
+}
+#brightness {background-color: #333; }
+#movement > div {
+    display: none;
+    position: absolute;
+    top: 0; bottom: 0;
+    padding-top: 33%;
+    font-size: 36px;
+    text-align: center;
+    color: red;
+}
+#movement #left {
+    left: 0;
+    width: 37.5%;
+    font-weight: bold;
+}
+#movement #center {
+    left: 37.5%;
+    width: 25%;
+}
+#movement #right {
+    left: 62.5%;
+    width: 37.5%;
+    font-weight: bold;
+}
+#movement div.moving {
+    background-color: rgba(0, 255, 0, 0.99);
+}
+#loc > div {
+    width: 25%; height: 33.333%;
+    float: left;
 }
 </style>
 
@@ -19,37 +57,101 @@
     <div id="brightness"></div>
 
     <div id="movement">
-        <div id="left"></div>
-        <div id="center"></div>
-        <div id="right"></div>
+        <div id="left">←</div>
+        <div id="center">○</div>
+        <div id="right">→</div>
+    </div>
+
+    <div id="loc">
+        <div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div>
+        <div></div><div></div><div></div><div></div>
     </div>
 
     <canvas id="edges" width="400" height="300"></canvas>
 </div>
 
+<div id="state">
 <h3>Sense State</h3>
 <pre id="senseState"></pre>
+</div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
 
-var socket;
+var socket, canvasEdge, ctxEdge, gradEdge;
 
-function scaleToShade(normalizedBrightness) {
-    var scaleToHex = Math.floor(normalizedBrightness * 16).toString(16);
-    console.log(scaleToHex);
-    //return '#' + Math.floor()
+function displayOverallBrightness(brightnessNormalized) {
+    var to8Bit = Math.floor(brightnessNormalized * 256),
+        rgbaShade = 'rgba(' + to8Bit + ', ' + to8Bit + ', ' + to8Bit + ', 0.5)',
+        brightnessDiv = document.getElementById('brightness');
+
+    brightnessDiv.style.backgroundColor = rgbaShade;
+}
+
+function displayMotionDirection(dir) {
+    var motionDivs = {};
+    motionDivs.left = document.getElementById('left');
+    motionDivs.center = document.getElementById('center');
+    motionDivs.right = document.getElementById('right');
+
+    motionDivs.left.style.display = 'none';
+    motionDivs.center.style.display = 'none';
+    motionDivs.right.style.display = 'none';
+    if (dir !== 'none') {
+        motionDivs[dir].style.display = 'block';
+    }
+}
+
+function displayMotionLocation(dir) {
+    var motionDivs = document.querySelectorAll('#loc div'), ii, len;
+    len = motionDivs.length;
+    //console.log(motionDivs);
+
+    for (ii = 0; ii < len; ii += 1) {
+        if (dir[ii] > 0.01) {
+            motionDivs[ii].style.backgroundColor = 'rgba(0, 255, 0, ' + dir[ii].toFixed(2) + ')';
+        } else {
+            motionDivs[ii].style.backgroundColor = 'transparent';
+        }
+    }
+}
+
+function displayEdges(edges) {
+    ctxEdge.clearRect(0, 0, canvasEdge.width, canvasEdge.height);
+
+    edges.forEach(function (edge) {
+        var pos = edge.i,
+            x = pos % 64,
+            y = Math.floor(pos / 64);
+
+        //ctxEdge.fillRect(x * 6.25, y * 6.25, 3.5, 3.5);
+        ctxEdge.beginPath();
+        ctxEdge.arc(x * 6.25, y * 6.25, 3.125, 0, Math.PI * 2, true);
+        ctxEdge.closePath();
+        ctxEdge.fill();
+    });
 }
 
 function init() {
     socket = io();
+    canvasEdge = document.getElementById('edges');
+    ctxEdge = canvasEdge.getContext("2d");
+    ctxEdge.fillStyle = 'black';
+    /*gradEdge = ctxEdge.createRadialGradient(6.25,6.25,6.25,6.25,6.25,0);
+    gradEdge.addColorStop(0, 'rgba(0, 0, 0, 1)');
+    gradEdge.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctxEdge.fillStyle = gradEdge;*/
+        //ctx.fillRect(0,0,150,150);
+
     socket.on('senseState', function(msg) {
         var jsonState = JSON.parse(msg);
         var jsonString = JSON.stringify(jsonState, null, '    ');
         document.getElementById('senseState').innerHTML = jsonString;
-
-        //document.getElementById('brightness').style.backgroundColor = '#000';
-        scaleToShade(normalizedBrightness);
+        displayOverallBrightness(jsonState.perceptions.brightnessOverall);
+        displayMotionDirection(jsonState.perceptions.motionDirection);
+        displayMotionLocation(jsonState.perceptions.motionLocation);
+        displayEdges(jsonState.perceptions.edges);
     });
 }
 
