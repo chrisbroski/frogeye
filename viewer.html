@@ -116,6 +116,7 @@ function init() {
     canvasEdge = document.getElementById('edges');
     ctxEdge = canvasEdge.getContext("2d");
     //ctxEdge.fillStyle = 'black';
+    ctxEdge.strokeStyle = 'black';
 
     socket.on('senseState', function(msg) {
         var jsonState = JSON.parse(msg);
