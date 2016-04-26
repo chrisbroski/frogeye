@@ -1,7 +1,7 @@
 /*jslint node: true */
 
-function motionDirection(movement, dir) {
-    if (movement > 20) {
+function motionDirection(dir) {
+    if (dir[0] + dir[1] + dir[2] > 20) {
         if (dir[0] > dir[1] && dir[0] > dir[2]) {
             return 'left';
         }
@@ -80,7 +80,10 @@ function isEdge(ii, visionWidth, imgPixelSize, luma) {
 }
 
 function frogeye(imgPixelSize, visionWidth, luma, changeAmount) {
-    var diff, ii, movement = 0, directions = [0, 0, 0], brightness = 0,
+    var diff,
+        ii,
+        directions = [0, 0, 0],
+        brightness = 0,
         hiResDir = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         contrast = [];
 
@@ -91,7 +94,6 @@ function frogeye(imgPixelSize, visionWidth, luma, changeAmount) {
             diff = Math.abs(luma.previous[ii] - luma.current[ii]);
             brightness += luma.current[ii];
             if (diff > changeAmount) {
-                movement += 1;
                 directions[lrOrCenter(ii, visionWidth)] += 1;
                 hiResDir[highResDirection(ii, visionWidth, imgPixelSize)] += 1;
             }
@@ -102,9 +104,8 @@ function frogeye(imgPixelSize, visionWidth, luma, changeAmount) {
     }
 
     return {
-        "movement": movement / imgPixelSize,
         "brightness": brightness / imgPixelSize / 256,
-        "direction": motionDirection(movement, directions),
+        "direction": motionDirection(directions),
         "moveArea": normalize(hiResDir, imgPixelSize / 12),
         "edges": contrast
     };

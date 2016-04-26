@@ -42,7 +42,13 @@ The files *viewerserver.js* and *viewer.html* were built to make monitoring the 
 3. **Attention** to control when observers and perceivers are active
 4. **Sense State** to organize and share perception information
 
-The *frogeye.js* module currently detects total motion (adapted from *motion-overall.js*,) the direction of greatest movement (left, right, center, and none) and overall brightness.
+The *frogeye.js* module currently detects total motion (adapted from *motion-overall.js*,) the direction of greatest movement (left, right, center, and none,) and overall brightness.
+
+1. Total motion in the visual field
+2. Direction (left, center, right, or none) of the most motion
+3. Motion location in a 4 x 3 grid
+4. Overall brightness of the visual field
+5. Contrast points in one of 3,072 points (64 x 48 grid)
 
 ## Hardware
 

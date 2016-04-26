@@ -9,45 +9,26 @@
     border: 1px solid  #333;
     float: left;
 }
-#state {
-    margin-top: -1em; padding-left: 1em;
-    float: left;
-}
 #frogeye > div, #frogeye canvas {
     position: absolute;
     top: 0; right: 0; bottom: 0; left: 0;
 }
+#state {margin-top: -1em; padding-left: 1em; float: left; }
 #brightness {background-color: #333; }
 #movement > div {
+    padding-top: 33%;
     display: none;
     position: absolute;
     top: 0; bottom: 0;
-    padding-top: 33%;
     font-size: 36px;
     text-align: center;
     color: red;
 }
-#movement #left {
-    left: 0;
-    width: 37.5%;
-    font-weight: bold;
-}
-#movement #center {
-    left: 37.5%;
-    width: 25%;
-}
-#movement #right {
-    left: 62.5%;
-    width: 37.5%;
-    font-weight: bold;
-}
-#movement div.moving {
-    background-color: rgba(0, 255, 0, 0.99);
-}
-#loc > div {
-    width: 25%; height: 33.333%;
-    float: left;
-}
+#movement #left {left: 0; width: 37.5%; font-weight: bold; }
+#movement #center {left: 37.5%; width: 25%; }
+#movement #right {left: 62.5%; width: 37.5%; font-weight: bold; }
+#movement div.moving {background-color: rgba(0, 255, 0, 0.99); }
+#loc > div {width: 25%; height: 33.333%; float: left; }
 </style>
 
 <article>
@@ -78,7 +59,6 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-
 var socket, canvasEdge, ctxEdge, gradEdge;
 
 function displayOverallBrightness(brightnessNormalized) {
@@ -106,7 +86,6 @@ function displayMotionDirection(dir) {
 function displayMotionLocation(dir) {
     var motionDivs = document.querySelectorAll('#loc div'), ii, len;
     len = motionDivs.length;
-    //console.log(motionDivs);
 
     for (ii = 0; ii < len; ii += 1) {
         if (dir[ii] > 0.01) {
@@ -125,7 +104,6 @@ function displayEdges(edges) {
             x = pos % 64,
             y = Math.floor(pos / 64);
 
-        //ctxEdge.fillRect(x * 6.25, y * 6.25, 3.5, 3.5);
         ctxEdge.beginPath();
         ctxEdge.arc(x * 6.25, y * 6.25, 3.125, 0, Math.PI * 2, true);
         ctxEdge.closePath();
@@ -138,11 +116,6 @@ function init() {
     canvasEdge = document.getElementById('edges');
     ctxEdge = canvasEdge.getContext("2d");
     ctxEdge.fillStyle = 'black';
-    /*gradEdge = ctxEdge.createRadialGradient(6.25,6.25,6.25,6.25,6.25,0);
-    gradEdge.addColorStop(0, 'rgba(0, 0, 0, 1)');
-    gradEdge.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctxEdge.fillStyle = gradEdge;*/
-        //ctx.fillRect(0,0,150,150);
 
     socket.on('senseState', function(msg) {
         var jsonState = JSON.parse(msg);
