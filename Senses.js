@@ -26,17 +26,20 @@ function Senses(visionWidth, visionHeight) {
     // *Perceptions* are the results of processing raw sense state
     // They can only be written by perceivers, but can be read by anything
     state.perceptions = {
-        motionOverall: 0,
+        motionOverall: 0.0,
         motionDirection: 'none',
-        brightnessOverall: 0
+        brightnessOverall: 0.0
     };
 
-    // Perceptions have no state. Moods are persistent indicators that expire over time
+    // Perceptions have no persistent state. Moods are indicators that expire over time
     state.mood = [];
 
     // Sense state is publically readable (but not changeable).
     this.senseState = function (type) {
         if (type) {
+            if (type === 'mood') {
+                return JSON.parse(JSON.stringify({"perceptions": state.perceptions, "mood": state.mood}));
+            }
             return JSON.parse(JSON.stringify(state.perceptions[type]));
         }
         return JSON.parse(JSON.stringify({"perceptions": state.perceptions, "mood": state.mood}));
@@ -108,10 +111,6 @@ function Senses(visionWidth, visionHeight) {
             console.log('Restarting raspiyuv time lapse');
             attention.look(500);
         });
-    };
-
-    attention.mood = function () {
-        // setinterval to clean up expired moods
     };
 
     function init() {
