@@ -38,7 +38,7 @@ function Senses(visionWidth, visionHeight) {
     this.senseState = function (type) {
         if (type) {
             if (type === 'mood') {
-                return JSON.parse(JSON.stringify({"perceptions": state.perceptions, "mood": state.mood}));
+                return JSON.parse(JSON.stringify(state.mood));
             }
             return JSON.parse(JSON.stringify(state.perceptions[type]));
         }
@@ -114,7 +114,7 @@ function Senses(visionWidth, visionHeight) {
     };
 
     function init() {
-        console.log('init');
+        console.log('Initialize senses module');
         attention.look(500);
     }
 
