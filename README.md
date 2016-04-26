@@ -42,18 +42,19 @@ The files *viewerserver.js* and *viewer.html* were built to make monitoring the 
 3. **Attention** to control when observers and perceivers are active
 4. **Sense State** to organize and share perception information
 
-The *frogeye.js* module currently detects total motion (adapted from *motion-overall.js*,) the direction of greatest movement (left, right, center, and none,) and overall brightness.
+The *frogeye.js* module currently detects:
 
 1. Motion majority direction (left, center, right, or none)
 2. Motion location in a 4 x 3 grid
 3. Overall brightness of the visual field
 4. Contrast points in one of 3,072 points (64 x 48 grid)
 
-The viewer shows this data in a 400 x 300 display:
+The viewer shows visualizations of this data in a 400 x 300 display:
 
-1. Red arrow or dot indicating major motion direction
-2. Translucent green squares indicate motion location
-3. Background
+1. Red arrows or a dot indicate major motion direction
+2. Translucent green squares represent motion location
+3. Background color is proportional to overall brightness
+4. Plus signs (\+) for areas of contrast 
 
 ## Hardware
 
