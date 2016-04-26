@@ -6,7 +6,7 @@
     position: relative;
     overflow; auto;
     width: 400px; height: 300px;
-    border: 1px solid  #333;
+    border: 1px solid #333;
     float: left;
 }
 #frogeye > div, #frogeye canvas {
@@ -27,7 +27,6 @@
 #movement #left {left: 0; width: 37.5%; font-weight: bold; }
 #movement #center {left: 37.5%; width: 25%; }
 #movement #right {left: 62.5%; width: 37.5%; font-weight: bold; }
-#movement div.moving {background-color: rgba(0, 255, 0, 0.99); }
 #loc > div {width: 25%; height: 33.333%; float: left; }
 </style>
 
@@ -56,6 +55,8 @@
 <h3>Sense State</h3>
 <pre id="senseState"></pre>
 </div>
+
+</article>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -100,9 +101,8 @@ function displayEdges(edges) {
     ctxEdge.clearRect(0, 0, canvasEdge.width, canvasEdge.height);
 
     edges.forEach(function (edge) {
-        var pos = edge.i,
-            x = pos % 64,
-            y = Math.floor(pos / 64);
+        var x = edge.i % 64,
+            y = Math.floor(edge.i / 64);
 
         ctxEdge.beginPath();
         ctxEdge.moveTo(x * 6.25 - 3.125, y * 6.25);
@@ -116,6 +116,17 @@ function displayEdges(edges) {
     });
 }
 
+function senseStateReceived(senseState) {
+    var jsonState = JSON.parse(senseState),
+        jsonString = JSON.stringify(jsonState, null, '    ');
+
+    document.getElementById('senseState').innerHTML = jsonString;
+    displayOverallBrightness(jsonState.perceptions.brightnessOverall);
+    displayMotionDirection(jsonState.perceptions.motionDirection);
+    displayMotionLocation(jsonState.perceptions.motionLocation);
+    displayEdges(jsonState.perceptions.edges);
+}
+
 function init() {
     socket = io();
     canvasEdge = document.getElementById('edges');
@@ -124,15 +135,7 @@ function init() {
     ctxEdge.strokeStyle = 'black';
     ctxEdge.lineWidth = 1;
 
-    socket.on('senseState', function(msg) {
-        var jsonState = JSON.parse(msg);
-        var jsonString = JSON.stringify(jsonState, null, '    ');
-        document.getElementById('senseState').innerHTML = jsonString;
-        displayOverallBrightness(jsonState.perceptions.brightnessOverall);
-        displayMotionDirection(jsonState.perceptions.motionDirection);
-        displayMotionLocation(jsonState.perceptions.motionLocation);
-        displayEdges(jsonState.perceptions.edges);
-    });
+    socket.on('senseState', senseStateReceived);
 }
 
 init();
