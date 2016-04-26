@@ -47,14 +47,14 @@ The *frogeye.js* module currently detects:
 1. Motion majority direction (left, center, right, or none)
 2. Motion location in a 4 x 3 grid
 3. Overall brightness of the visual field
-4. Contrast points in one of 3,072 points (64 x 48 grid)
+4. Contrast in one of 3,072 points (64 x 48 grid)
 
 The viewer shows visualizations of this data in a 400 x 300 display:
 
-1. Red arrows or a dot indicate major motion direction
+1. Red arrows or a dot indicate primary motion direction
 2. Translucent green squares represent motion location
 3. Background color is proportional to overall brightness
-4. Plus signs (\+) for areas of contrast 
+4. Plus signs (\+) for areas of contrast
 
 ## Hardware
 
