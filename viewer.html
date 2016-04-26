@@ -59,7 +59,7 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-var socket, canvasEdge, ctxEdge, gradEdge;
+var socket, canvasEdge, ctxEdge;
 
 function displayOverallBrightness(brightnessNormalized) {
     var to8Bit = Math.floor(brightnessNormalized * 256),
@@ -107,7 +107,7 @@ function displayEdges(edges) {
         ctxEdge.beginPath();
         ctxEdge.arc(x * 6.25, y * 6.25, 3.125, 0, Math.PI * 2, true);
         ctxEdge.closePath();
-        ctxEdge.fill();
+        //ctxEdge.fill();
     });
 }
 
@@ -115,7 +115,7 @@ function init() {
     socket = io();
     canvasEdge = document.getElementById('edges');
     ctxEdge = canvasEdge.getContext("2d");
-    ctxEdge.fillStyle = 'black';
+    //ctxEdge.fillStyle = 'black';
 
     socket.on('senseState', function(msg) {
         var jsonState = JSON.parse(msg);
