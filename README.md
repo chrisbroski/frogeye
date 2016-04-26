@@ -1,12 +1,12 @@
 # frogeye
 
-Making a camera tell a computer what a frog sees
-
 I discovered the seminal 1959 paper "[What a Frog's Eye Tells a Frog's Brain](http://neuromajor.ucr.edu/courses/WhatTheFrogsEyeTellsTheFrogsBrain.pdf)" in a [Nautilus article on Walter Pitts](http://nautil.us/issue/21/information/the-man-who-tried-to-redeem-the-world-with-logic)
 
 Mind == Blown.
 
 Not only was Walter a fascinating person, but the results of the frog eye study jibed with [my own work on AI](http://behaviorallogic.com/foundation). The powerful simplicity of image processing in a frog's retina inspired me to attempt to build a simulation.
+
+## What Does a Frog's Eye Tell a Frog's Brain?
 
 The gist of the paper is that most people probably think that the eye works like a camera:
 
@@ -20,14 +20,14 @@ There was an intermediate layer of cells between the light-detecting ones and th
 
 What he discovered was that this middle layer of cells was doing significant visual processing. Among the types of visual analysis found were:
 
-* On/off - These cells signal if something in an area changes from light to dark or dark to light (implying movement.)
+* On/off - These cells signal if something in an area changes from light to dark or dark to light (signifying movement.)
 * Dimming - These cells fire when a large portion of the visible area suddenly gets darker.
 * Contrast - These cells recognize edges.
 * "Bug" - These cells send a signal when a small, round, moving object enters the field of view.
 
-The frog's brain didn't need to makes sense of the world at all. The intermediate retinal cells handle this in a very hard-wired way.
+The frog's brain didn't need to makes sense of the world at all. The intermediate retinal cells were handling this in a very hard-wired way.
 
-This looks nothing like a neural net. Walter Pitts was arguably the father of neural networks and a co-author of the frog paper. After the paper was published he burned all of his work and drank himself to death.
+This looks nothing like a neural net. Co-author Walter Pitts was arguably the father of neural networks. After the frog paper was published he burned all of his work and drank himself to death.
 
 ## Accomplishments So Far
 

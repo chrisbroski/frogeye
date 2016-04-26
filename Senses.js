@@ -8,40 +8,38 @@ function Senses(visionWidth, visionHeight) {
         frogeye = require('./frogeye.js'),
 
         // Declare private objects
-        state,
+        state = {},
         observers = {},
         perceivers = {},
         attention = {};
 
     // *Sense state* is a collection of all current sensory data.
-    state = {
+    state.raw = {
         // *Raw* state is unprocessed environment measurements received from sensors.
         // Raw state can only be written by observers and only read by perceivers
-        raw: {
-            luma: {
-                current: [],
-                previous: []
-            }
-        },
-
-        // *Perceptions* are the results of processing raw sensory data
-        // They can only be written to by perceivers, but can be read by everthing
-        perceptions: {
-            motionOverall: 0,
-            motionDirection: 'none',
-            brightnessOverall: 0
-        },
-
-        // Perceptions have no state. Moods are persistent indicators that expire over time
-        mood: []
+        luma: {
+            current: [],
+            previous: []
+        }
     };
+
+    // *Perceptions* are the results of processing raw sense state
+    // They can only be written by perceivers, but can be read by anything
+    state.perceptions = {
+        motionOverall: 0,
+        motionDirection: 'none',
+        brightnessOverall: 0
+    };
+
+    // Perceptions have no state. Moods are persistent indicators that expire over time
+    state.mood = [];
 
     // Sense state is publically readable (but not changeable).
     this.senseState = function (type) {
         if (type) {
             return JSON.parse(JSON.stringify(state.perceptions[type]));
         }
-        return JSON.parse(JSON.stringify(state.perceptions));
+        return JSON.parse(JSON.stringify({"perceptions": state.perceptions, "mood": state.mood}));
     };
 
     // *Perceivers* process raw sense state into meaningful information
@@ -92,7 +90,6 @@ function Senses(visionWidth, visionHeight) {
                 '-w', visionWidth.toString(10),
                 '-h', visionHeight.toString(10),
                 '-vf',
-                '-vf',
                 '-tl', timeLapseInterval.toString(10),
                 '-t', '300000', // Restart every 5 min
                 '-o', '-' // To stdout
@@ -111,6 +108,10 @@ function Senses(visionWidth, visionHeight) {
             console.log('Restarting raspiyuv time lapse');
             attention.look(500);
         });
+    };
+
+    attention.mood = function () {
+        // setinterval to clean up expired moods
     };
 
     function init() {
