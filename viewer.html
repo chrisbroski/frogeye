@@ -105,9 +105,14 @@ function displayEdges(edges) {
             y = Math.floor(pos / 64);
 
         ctxEdge.beginPath();
-        ctxEdge.arc(x * 6.25, y * 6.25, 3.125, 0, Math.PI * 2, true);
-        ctxEdge.closePath();
-        //ctxEdge.fill();
+        ctxEdge.moveTo(x * 6.25 - 3.125, y * 6.25);
+        ctxEdge.lineTo(x * 6.25 + 3.125, y * 6.25);
+        ctxEdge.stroke();
+
+        ctxEdge.beginPath();
+        ctxEdge.moveTo(x * 6.25, y * 6.25 - 3.125);
+        ctxEdge.lineTo(x * 6.25, y * 6.25 + 3.125);
+        ctxEdge.stroke();
     });
 }
 
@@ -115,8 +120,9 @@ function init() {
     socket = io();
     canvasEdge = document.getElementById('edges');
     ctxEdge = canvasEdge.getContext("2d");
-    //ctxEdge.fillStyle = 'black';
+
     ctxEdge.strokeStyle = 'black';
+    ctxEdge.lineWidth = 1;
 
     socket.on('senseState', function(msg) {
         var jsonState = JSON.parse(msg);
