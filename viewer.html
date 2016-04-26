@@ -8,6 +8,7 @@
     width: 400px; height: 300px;
     border: 1px solid #333;
     float: left;
+    background: #000;
 }
 #frogeye > div, #frogeye canvas {
     position: absolute;
@@ -64,9 +65,15 @@ var socket, canvasEdge, ctxEdge;
 
 function displayOverallBrightness(brightnessNormalized) {
     var to8Bit = Math.floor(brightnessNormalized * 256),
-        rgbaShade = 'rgba(' + to8Bit + ', ' + to8Bit + ', ' + to8Bit + ', 0.5)',
+        brightnessAmplified = brightnessNormalized * 2.5,
+        rgbaShade,
         brightnessDiv = document.getElementById('brightness');
 
+    if (brightnessAmplified > 1.0) {
+        brightnessAmplified = 1.0;
+    }
+    rgbaShade = 'rgba(255, 255, 255, ' + brightnessAmplified + ')';
+    console.log(rgbaShade);
     brightnessDiv.style.backgroundColor = rgbaShade;
 }
 
