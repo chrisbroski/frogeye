@@ -31,7 +31,7 @@ This looks nothing like a neural net. Co-author Walter Pitts was arguably the fa
 
 ## Implemented So Far
 
-I decided to try to simulate on/off (movement) cells using a Raspberry Pi first. The file *overall-movement.js* is a simple processor to measure total movement in the field of vision of a Pi camera.
+I decided to try to simulate on/off (movement) cells using a Raspberry Pi first. The file *[motion-overall.js](https://github.com/chrisbroski/frogeye/blob/master/motion-overall.js)* is a simple processor to measure total movement in the field of vision of a Pi camera.
 
 The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server broadcasts perception data to the HTML page using the [Socket.io](http://socket.io/) library. The viewer displays raw perception data numerically and visually.
 
