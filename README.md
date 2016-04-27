@@ -29,11 +29,11 @@ The frog's brain didn't need to makes sense of the world at all. The intermediat
 
 This looks nothing like a neural net. Co-author Walter Pitts was arguably the father of neural networks. After the frog paper was published he burned all of his work and drank himself to death.
 
-## Accomplishments So Far
+## Implemented So Far
 
-I decided to try to simulate on/off (movement) cells first. The file *overall-movement.js* is a simple processor to measure total movement in the field of vision of a Pi camera.
+I decided to try to simulate on/off (movement) cells using a Raspberry Pi first. The file *overall-movement.js* is a simple processor to measure total movement in the field of vision of a Pi camera.
 
-The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server sends perception information to the HTML page using the [Socket.io](http://socket.io/) library.
+The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server broadcasts perception data to the HTML page using the [Socket.io](http://socket.io/) library. The viewer displays raw perception data numerically and visually.
 
 *Senses.js* is a module designed to organize all of the sensory processing of an intelligent artifact. It is built according to [my AI architecture](http://behaviorallogic.com/api/spec) to have 4 main sections:
 
@@ -44,7 +44,7 @@ The files *viewerserver.js* and *viewer.html* were built to make monitoring the 
 
 The *frogeye.js* module currently detects:
 
-1. Motion majority direction (left, center, right, or none)
+1. Primary motion direction (left, center, right, or none)
 2. Motion location in a 4 x 3 grid
 3. Overall brightness of the visual field
 4. Contrast in one of 3,072 points (64 x 48 grid)
