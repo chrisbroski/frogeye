@@ -35,7 +35,7 @@ I decided to try to simulate on/off (movement) cells using a Raspberry Pi first.
 
 The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server broadcasts perception data to the HTML page using the [Socket.io](http://socket.io/) library. The viewer displays raw perception data numerically and visually.
 
-<img src="img/viewer_screenshot.png" alt="Frogeye viewer screenshot" style="border: 1px solid #666">
+<img src="img/viewer_screenshot.png" alt="Frogeye viewer screenshot">
 
 *Senses.js* is a module designed to organize all of the sensory processing of an intelligent artifact. It is built according to [my AI architecture](http://behaviorallogic.com/api/spec) to have 4 main sections:
 
@@ -77,6 +77,14 @@ I recommend getting started using Node.js on the Raspberry Pi with this [AdaFrui
 ### [Atom.io](http://atom.io/)
 
 I am using GitHub's Atom.io code editor on Mac to write the JavaScript. I recommend the [remote-atom](https://atom.io/packages/remote-atom) plugin to easily sync the code files to the Raspberry Pi.
+
+## Performance
+
+If you are curious about how much this visual processing in Node.js asks of your hardware resources, I checked. The *viewserver.js* process (which imports *Senses.js* which imports *frogeye.js*) puts my Raspberry Pi 2 at about 4.0% Cpu with negligible RAM usage. This is at a time lapse camera setting of 0 (take pictures as fast as possible, minimum 30ms) and sending sense data to the client every 20ms (50 times per second.) Here's the top output if you don't believe me.
+
+<img src="img/topfrogeye.png" alt"Top output of viewserver.js">
+
+The view client runs on a different machine so its usage is not reflected in the above data.
 
 ### Reverse-Engineering the Y'UV Image Format
 
