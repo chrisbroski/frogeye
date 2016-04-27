@@ -35,6 +35,8 @@ I decided to try to simulate on/off (movement) cells using a Raspberry Pi first.
 
 The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server broadcasts perception data to the HTML page using the [Socket.io](http://socket.io/) library. The viewer displays raw perception data numerically and visually.
 
+<img src="img/viewer_screenshot.png" alt="Frogeye viewer screenshot">
+
 *Senses.js* is a module designed to organize all of the sensory processing of an intelligent artifact. It is built according to [my AI architecture](http://behaviorallogic.com/api/spec) to have 4 main sections:
 
 1. **Observers** to collect raw sensory data
