@@ -13,9 +13,9 @@ app.get('/', function (req, res) {
 
 function sendSenseData() {
     setInterval(function () {
-        // send sense data to viewer
+        // send sense data to viewer 100x per second
         io.emit('senseState', JSON.stringify(senses.senseState()));
-    }, 500);
+    }, 20);
 }
 
 io.on('connection', function (socket) {

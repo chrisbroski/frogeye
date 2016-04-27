@@ -94,8 +94,9 @@ function Senses(visionWidth, visionHeight) {
             cam = spawn('raspiyuv', [
                 '-w', visionWidth.toString(10),
                 '-h', visionHeight.toString(10),
+                '-p', '50, 80, 400, 300',
                 '-vf',
-                '-tl', timeLapseInterval.toString(10),
+                '-tl', timeLapseInterval.toString(10), // 0 = as fast as possible
                 '-t', '300000', // Restart every 5 min
                 '-o', '-' // To stdout
             ]);
@@ -111,13 +112,13 @@ function Senses(visionWidth, visionHeight) {
         cam.on('exit', function (code) {
             console.log('raspiyuv process exited with code ' + code);
             console.log('Restarting raspiyuv time lapse');
-            attention.look(500);
+            attention.look(0);
         });
     };
 
     function init() {
         console.log('Initialize senses module');
-        attention.look(500);
+        attention.look(0);
     }
 
     init();
