@@ -32,23 +32,17 @@ function Senses(visionWidth, visionHeight) {
         edges: []
     };
 
-    // Perceptions have no persistent state. Moods are indicators that expire over time
-    state.mood = [];
-
     // Sense state is publically readable (but not changeable).
     this.senseState = function (type) {
         if (type) {
-            if (type === 'mood') {
-                return JSON.parse(JSON.stringify(state.mood));
-            }
             return JSON.parse(JSON.stringify(state.perceptions[type]));
         }
-        return JSON.parse(JSON.stringify({"perceptions": state.perceptions, "mood": state.mood}));
+        return JSON.parse(JSON.stringify(state.perceptions));
     };
 
     // *Perceivers* process raw sense state into meaningful information
     perceivers.frogEye = function (imgPixelSize) {
-        var frogView = frogeye(imgPixelSize, visionWidth, state.raw.luma, 20);
+        var frogView = frogeye(state.raw.luma, imgPixelSize, visionWidth, 20);
 
         state.perceptions.brightnessOverall = frogView.brightness;
         state.perceptions.motionDirection = frogView.direction;
@@ -90,16 +84,18 @@ function Senses(visionWidth, visionHeight) {
     attention.look = function (timeLapseInterval) {
         var imgPixelSize = visionWidth * visionHeight,
             imgRawFileSize = imgPixelSize * 1.5,
+            cam;
 
-            cam = spawn('raspiyuv', [
-                '-w', visionWidth.toString(10),
-                '-h', visionHeight.toString(10),
-                '-p', '50, 80, 400, 300',
-                '-vf',
-                '-tl', timeLapseInterval.toString(10), // 0 = as fast as possible
-                '-t', '300000', // Restart every 5 min
-                '-o', '-' // To stdout
-            ]);
+        timeLapseInterval = timeLapseInterval || 0;
+        cam = spawn('raspiyuv', [
+            '-w', visionWidth.toString(10),
+            '-h', visionHeight.toString(10),
+            '-p', '50, 80, 400, 300', // small preview window
+            '-vf', // My camera is upside-down so flip the image vertically
+            '-tl', timeLapseInterval.toString(10), // 0 = as fast as possible
+            '-t', '300000', // Restart every 5 min
+            '-o', '-' // To stdout
+        ]);
 
         cam.stdout.on('data', function (data) {
             observers.luma(data, imgRawFileSize, imgPixelSize);
@@ -112,13 +108,13 @@ function Senses(visionWidth, visionHeight) {
         cam.on('exit', function (code) {
             console.log('raspiyuv process exited with code ' + code);
             console.log('Restarting raspiyuv time lapse');
-            attention.look(0);
+            attention.look();
         });
     };
 
     function init() {
         console.log('Initialize senses module');
-        attention.look(0);
+        attention.look();
     }
 
     init();

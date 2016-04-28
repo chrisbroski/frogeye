@@ -128,10 +128,10 @@ function senseStateReceived(senseState) {
         jsonString = JSON.stringify(jsonState, null, '    ');
 
     document.getElementById('senseState').innerHTML = jsonString;
-    displayOverallBrightness(jsonState.perceptions.brightnessOverall);
-    displayMotionDirection(jsonState.perceptions.motionDirection);
-    displayMotionLocation(jsonState.perceptions.motionLocation);
-    displayEdges(jsonState.perceptions.edges);
+    displayOverallBrightness(jsonState.brightnessOverall);
+    displayMotionDirection(jsonState.motionDirection);
+    displayMotionLocation(jsonState.motionLocation);
+    displayEdges(jsonState.edges);
 }
 
 function init() {
