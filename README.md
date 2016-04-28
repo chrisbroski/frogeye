@@ -104,12 +104,8 @@ I am digging YUV format for image processing. It is not only easy to use, but th
 
 The first part of the binary data of a `raspiyuv` capture is 3072 (64 x 48) 8-bit values (0x00 - 0xFF, or 0 - 255 in decimal) that represent the Y, or luma, component of the image where 0x00 is the darkest and 0xFF is the brightest value. This is what I am using for most of the image analysis.
 
-<<<<<<< HEAD
-<img alt="UV color plane at Y=0.5" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/YUV_UV_plane.svg" title="By Tonyle - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=6977944" width="300" height="300">
-=======
 ##### UV Component
 
 The color information is 1/2 the resolution of the luma component. So in my example, it is a 32 pixel x 24 pixel bitmap. Also, I am used to an RGB color space, but UV represents color using only 2 components instead of three somehow.
 
-![UV color plane at Y=0.5](https://upload.wikimedia.org/wikipedia/commons/f/f9/YUV_UV_plane.svg "By Tonyle - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=6977944")
->>>>>>> e8c0f7ce0cc4505ae08d21ebe13e3b0276b5b20a
+<img alt="UV color plane at Y=0.5" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/YUV_UV_plane.svg" title="By Tonyle - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=6977944" width="300" height="300">
