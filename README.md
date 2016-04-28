@@ -103,3 +103,6 @@ I am using a 64 pixel wide by 48 pixel high image, so let's assume that for my e
 The first part of the binary data of a `raspiyuv` capture is 3072 (64 x 48) 8-bit values (0x00 - 0xFF, or 0 - 255 in decimal) that represent the Y, or luma, component of the image where 0x00 is the darkest and 0xFF is the brightest value. This is what I am using for most of the image analysis.
 
 ##### UV Component
+
+https://en.wikipedia.org/wiki/YUV#/media/File:YUV_UV_plane.svg
+
