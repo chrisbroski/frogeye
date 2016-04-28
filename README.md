@@ -106,4 +106,4 @@ The first part of the binary data of a `raspiyuv` capture is 3072 (64 x 48) 8-bi
 
 ##### UV Component
 
-![UV color plane at Y=0.5](https://upload.wikimedia.org/wikipedia/commons/f/f9/YUV_UV_plane.svg)
+![UV color plane at Y=0.5](https://upload.wikimedia.org/wikipedia/commons/f/f9/YUV_UV_plane.svg "By Tonyle - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=6977944")
