@@ -79,8 +79,8 @@ function isEdge(ii, visionWidth, imgPixelSize, luma) {
     }
 }
 
-function frogeye(imgPixelSize, visionWidth, luma, changeAmount) {
-    // 'luma' is the raw data: two arrays, one current and one previous, of brightness values 0-255 
+function frogeye(luma, imgPixelSize, visionWidth, changeAmount) {
+    // 'luma' is the raw data: two arrays, one current and one previous, of brightness values 0-255
     var diff,
         ii,
         directions = [0, 0, 0],
