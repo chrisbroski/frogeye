@@ -88,14 +88,18 @@ The view client runs on a different machine so its usage is not reflected in the
 
 ### Reverse-Engineering the Y'UV Image Format
 
-The Raspberry Pi camera can output uncompressed files in [YUV format](https://en.wikipedia.org/wiki/YUV) that are easier to analyze than JPEGs, once you know what all the ones and zeros mean. I had some fun using [Hex Fiend](http://ridiculousfish.com/hexfiend/) to edit the raw files, then converted them to JPEG with [ImageMagick](http://www.imagemagick.org/script/index.php) to view the effects. The first 2/3 of the file are a simple grayscale bitmap. The last third is color information that I have not quite figured out yet.
-
-#### [ImageMagick](http://www.imagemagick.org/script/index.php)
-
-I use ImageMagick to convert YUV image data to something viewable to aid in reverse-engineering the raw format. I installed using the Homebrew package.
+The Raspberry Pi camera can output uncompressed files in [Y'UV format](https://en.wikipedia.org/wiki/YUV) (or YUV or YCbCr) that are easier to analyze than JPEGs, once you know what all the ones and zeros mean. I had some fun using [Hex Fiend](http://ridiculousfish.com/hexfiend/) to edit the raw files, then converted them to JPEG with [ImageMagick](http://www.imagemagick.org/script/index.php) with this command:
 
     convert -size "64x48" -depth 8 yuv:test.raw conv.jpg
 
-#### [Hex Fiend](http://ridiculousfish.com/hexfiend/)
+Then used Apple Preview to see how I mangled the picture.
 
-This hex editor seems to work fine on OSX. Installed with Homebrew.
+#### Summary of Y'UV
+
+I am using a 64 pixel wide by 48 pixel high image, so let's assume that for my examples. This generates a file 4608 bytes in size (1.5 * 64 * 48) where the first 2/3 is a simple black-and-white bitmap and the last 1/3 is color information. How it stores the image dimensions is a mystery. Magic maybe?
+
+##### Y Component
+
+The first part of the binary data of a `raspiyuv` capture is 3072 (64 x 48) 8-bit values (0x00 - 0xFF, or 0 - 255 in decimal) that represent the Y, or luma, component of the image where 0x00 is the darkest and 0xFF is the brightest value. This is what I am using for most of the image analysis.
+
+##### UV Component
