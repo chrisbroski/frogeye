@@ -109,3 +109,5 @@ The first part of the binary data of a `raspiyuv` capture is 3072 (64 x 48) 8-bi
 The color information is 1/2 the resolution of the luma component. So in my example, it is a 32 pixel x 24 pixel bitmap. Also, I am used to an RGB color space, but UV represents color using only 2 components instead of three somehow.
 
 <img alt="UV color plane at Y=0.5" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/YUV_UV_plane.svg" title="By Tonyle - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=6977944" width="300" height="300">
+
+[More YUV info](http://softpixel.com/~cwright/programming/colorspace/yuv/)
