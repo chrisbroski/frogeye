@@ -20,6 +20,10 @@ function Senses(visionWidth, visionHeight) {
         luma: {
             current: [],
             previous: []
+        },
+        chroma: {
+            U: [],
+            V: []
         }
     };
 
@@ -29,6 +33,7 @@ function Senses(visionWidth, visionHeight) {
         motionDirection: 'none',
         motionLocation: [],
         brightnessOverall: 0.0,
+        pinkest: -1,
         edges: []
     };
 
@@ -42,17 +47,21 @@ function Senses(visionWidth, visionHeight) {
 
     // *Perceivers* process raw sense state into meaningful information
     perceivers.frogEye = function (imgPixelSize) {
-        var frogView = frogeye(state.raw.luma, imgPixelSize, visionWidth, 20);
+        var frogView = frogeye(state.raw.luma, state.raw.chroma, imgPixelSize, visionWidth, 20);
 
         state.perceptions.brightnessOverall = frogView.brightness;
         state.perceptions.motionDirection = frogView.direction;
         state.perceptions.motionLocation = frogView.moveArea;
         state.perceptions.edges = frogView.edges;
+        //state.perceptions.magenta = frogView.magenta;
+        state.perceptions.pinkest = frogView.pinkest;
     };
 
     // *Observers* populate raw sense state from a creature's sensors.
     observers.luma = function (yuvData, imgRawFileSize, imgPixelSize) {
         var lumaData = [],
+            chromaU = [],
+            chromaV = [],
             ii;
 
         // Sensor data validation, if needed
@@ -65,10 +74,18 @@ function Senses(visionWidth, visionHeight) {
         for (ii = 0; ii < imgPixelSize; ii += 1) {
             lumaData.push(yuvData.readUInt8(ii));
         }
+        for (ii = imgPixelSize; ii < imgPixelSize * 1.25; ii += 1) {
+            chromaU.push(yuvData.readUInt8(ii));
+        }
+        for (ii = imgPixelSize * 1.25; ii < imgPixelSize * 1.5; ii += 1) {
+            chromaV.push(yuvData.readUInt8(ii));
+        }
 
         // Set raw global sense state
         state.raw.luma.previous = state.raw.luma.current;
         state.raw.luma.current = lumaData;
+        state.raw.chroma.U = chromaU;
+        state.raw.chroma.V = chromaV;
 
         /*
         Perceivers should typically be handled by the attention object, but for simplicity

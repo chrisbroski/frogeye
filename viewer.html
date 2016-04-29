@@ -50,6 +50,7 @@
     </div>
 
     <canvas id="edges" width="400" height="300"></canvas>
+    <canvas id="pink" width="400" height="300"></canvas>
 </div>
 
 <div id="state">
@@ -61,7 +62,7 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-var socket, canvasEdge, ctxEdge;
+var socket, canvasEdge, ctxEdge, canvasPink, ctxPink;
 
 function displayOverallBrightness(brightnessNormalized) {
     var to8Bit = Math.floor(brightnessNormalized * 256),
@@ -73,7 +74,6 @@ function displayOverallBrightness(brightnessNormalized) {
         brightnessAmplified = 1.0;
     }
     rgbaShade = 'rgba(255, 255, 255, ' + brightnessAmplified + ')';
-    console.log(rgbaShade);
     brightnessDiv.style.backgroundColor = rgbaShade;
 }
 
@@ -123,6 +123,18 @@ function displayEdges(edges) {
     });
 }
 
+function displayPinkest(pinkest) {
+    var x = (pinkest % 32) * 2,
+        y = Math.floor(pinkest / 32) * 2;
+
+    ctxPink.clearRect(0, 0, canvasPink.width, canvasPink.height);
+
+    ctxPink.beginPath();
+    ctxPink.arc(x, y, 10, 0, Math.PI * 2, true);
+    ctxPink.closePath();
+    ctxPink.fill();
+}
+
 function senseStateReceived(senseState) {
     var jsonState = JSON.parse(senseState),
         jsonString = JSON.stringify(jsonState, null, '    ');
@@ -132,15 +144,20 @@ function senseStateReceived(senseState) {
     displayMotionDirection(jsonState.motionDirection);
     displayMotionLocation(jsonState.motionLocation);
     displayEdges(jsonState.edges);
+    displayPinkest(jsonState.pinkest);
 }
 
 function init() {
     socket = io();
+
     canvasEdge = document.getElementById('edges');
     ctxEdge = canvasEdge.getContext("2d");
-
     ctxEdge.strokeStyle = 'black';
     ctxEdge.lineWidth = 1;
+
+    canvasPink = document.getElementById('pink');
+    ctxPink = canvasPink.getContext("2d");
+    ctxPink.fillStyle = 'rgba(255, 0, 255, 0.5)';
 
     socket.on('senseState', senseStateReceived);
 }

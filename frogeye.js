@@ -79,14 +79,20 @@ function isEdge(ii, visionWidth, imgPixelSize, luma) {
     }
 }
 
-function frogeye(luma, imgPixelSize, visionWidth, changeAmount) {
+function isPink(chroma, ii) {
+    return (chroma.U[ii] > 120 && chroma.V[ii] > 120);
+}
+
+function frogeye(luma, chroma, imgPixelSize, visionWidth, changeAmount) {
     // 'luma' is the raw data: two arrays, one current and one previous, of brightness values 0-255
     var diff,
         ii,
         directions = [0, 0, 0],
         brightness = 0,
         hiResDir = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        contrast = [];
+        contrast = [],
+        pinkestValue = [0, 0],
+        pinkest;
 
     // This could be optimized with a first image flag
     if (luma.previous.length) {
@@ -102,13 +108,26 @@ function frogeye(luma, imgPixelSize, visionWidth, changeAmount) {
                 contrast.push(ii);
             }
         }
+        for (ii = 0; ii < Math.floor(imgPixelSize / 4); ii += 1) {
+            if (chroma.U[ii] > pinkestValue[0] && chroma.V[ii] > pinkestValue[0]) {
+                pinkestValue[0] = chroma.U[ii];
+                pinkestValue[1] = chroma.V[ii];
+                pinkest = ii;
+            }
+            /*if (isPink(chroma, ii)) {
+                magenta.push(ii);
+            }*/
+        }
+        //console.log(pinkest);
     }
 
     return {
         "brightness": brightness / imgPixelSize / 256,
         "direction": motionDirection(directions),
         "moveArea": normalize(hiResDir, imgPixelSize / 12),
-        "edges": contrast
+        "edges": contrast,
+        //"magenta": magenta,
+        "pinkest": pinkest
     };
 }
 
