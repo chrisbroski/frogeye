@@ -30,10 +30,10 @@ function Senses(visionWidth, visionHeight) {
     // *Perceptions* are the results of processing raw sense state
     // They can only be written by perceivers, but can be read by anything
     state.perceptions = {
-        motionDirection: 'none',
         motionLocation: [],
         brightnessOverall: 0.0,
-        pinkest: -1,
+        centerColor: {"hue": 0, "saturation": 0},
+        ball: -1,
         edges: []
     };
 
@@ -50,11 +50,11 @@ function Senses(visionWidth, visionHeight) {
         var frogView = frogeye(state.raw.luma, state.raw.chroma, imgPixelSize, visionWidth, 20);
 
         state.perceptions.brightnessOverall = frogView.brightness;
-        state.perceptions.motionDirection = frogView.direction;
-        state.perceptions.motionLocation = frogView.moveArea;
+        state.perceptions.motionLocation = frogView.moveLocation;
         state.perceptions.edges = frogView.edges;
-        //state.perceptions.magenta = frogView.magenta;
-        state.perceptions.pinkest = frogView.pinkest;
+        state.perceptions.centerColor.hue = frogView.centerColor[0];
+        state.perceptions.centerColor.saturation = frogView.centerColor[1];
+        state.perceptions.ball = frogView.ball;
     };
 
     // *Observers* populate raw sense state from a creature's sensors.
@@ -66,7 +66,7 @@ function Senses(visionWidth, visionHeight) {
 
         // Sensor data validation, if needed
         if (yuvData.length < imgRawFileSize - 1) {
-            console.log('Incorrect image file size');
+            console.log('Incorrect image file size: ' + yuvData.length);
             return;
         }
 

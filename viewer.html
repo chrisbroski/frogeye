@@ -16,18 +16,6 @@
 }
 #state {margin-top: -1em; padding-left: 1em; float: left; }
 #brightness {background-color: #333; }
-#movement > div {
-    padding-top: 33%;
-    display: none;
-    position: absolute;
-    top: 0; bottom: 0;
-    font-size: 36px;
-    text-align: center;
-    color: red;
-}
-#movement #left {left: 0; width: 37.5%; font-weight: bold; }
-#movement #center {left: 37.5%; width: 25%; }
-#movement #right {left: 62.5%; width: 37.5%; font-weight: bold; }
 #loc > div {width: 25%; height: 33.333%; float: left; }
 </style>
 
@@ -37,12 +25,6 @@
 <div id="frogeye">
     <div id="brightness"></div>
 
-    <div id="movement">
-        <div id="left">←</div>
-        <div id="center">○</div>
-        <div id="right">→</div>
-    </div>
-
     <div id="loc">
         <div></div><div></div><div></div><div></div>
         <div></div><div></div><div></div><div></div>
@@ -50,7 +32,8 @@
     </div>
 
     <canvas id="edges" width="400" height="300"></canvas>
-    <canvas id="pink" width="400" height="300"></canvas>
+    <canvas id="ball" width="400" height="300"></canvas>
+    <canvas id="target" width="400" height="300"></canvas>
 </div>
 
 <div id="state">
@@ -62,7 +45,7 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-var socket, canvasEdge, ctxEdge, canvasPink, ctxPink;
+var socket, canvasEdge, ctxEdge, canvasBall, ctxBall;
 
 function displayOverallBrightness(brightnessNormalized) {
     var to8Bit = Math.floor(brightnessNormalized * 256),
@@ -75,20 +58,6 @@ function displayOverallBrightness(brightnessNormalized) {
     }
     rgbaShade = 'rgba(255, 255, 255, ' + brightnessAmplified + ')';
     brightnessDiv.style.backgroundColor = rgbaShade;
-}
-
-function displayMotionDirection(dir) {
-    var motionDivs = {};
-    motionDivs.left = document.getElementById('left');
-    motionDivs.center = document.getElementById('center');
-    motionDivs.right = document.getElementById('right');
-
-    motionDivs.left.style.display = 'none';
-    motionDivs.center.style.display = 'none';
-    motionDivs.right.style.display = 'none';
-    if (dir !== 'none') {
-        motionDivs[dir].style.display = 'block';
-    }
 }
 
 function displayMotionLocation(dir) {
@@ -123,16 +92,19 @@ function displayEdges(edges) {
     });
 }
 
-function displayPinkest(pinkest) {
-    var x = (pinkest % 32) * 2,
-        y = Math.floor(pinkest / 32) * 2;
+function displayBall(loc) {
+    var x, y;
+    ctxBall.clearRect(0, 0, canvasBall.width, canvasBall.height);
 
-    ctxPink.clearRect(0, 0, canvasPink.width, canvasPink.height);
+    if (loc > -1) {
+        x = (loc % 32) * 2;
+        y = Math.floor(loc / 32) * 2;
 
-    ctxPink.beginPath();
-    ctxPink.arc(x, y, 10, 0, Math.PI * 2, true);
-    ctxPink.closePath();
-    ctxPink.fill();
+        ctxBall.beginPath();
+        ctxBall.arc(x * 6.25, y * 6.25, 10, 0, Math.PI * 2, true);
+        ctxBall.closePath();
+        ctxBall.fill();
+    }
 }
 
 function senseStateReceived(senseState) {
@@ -141,13 +113,17 @@ function senseStateReceived(senseState) {
 
     document.getElementById('senseState').innerHTML = jsonString;
     displayOverallBrightness(jsonState.brightnessOverall);
-    displayMotionDirection(jsonState.motionDirection);
     displayMotionLocation(jsonState.motionLocation);
     displayEdges(jsonState.edges);
-    displayPinkest(jsonState.pinkest);
+    displayBall(jsonState.ball);
 }
 
 function init() {
+    var canvasTarget = document.getElementById('target'),
+        ctxTarget = canvasTarget.getContext("2d");
+
+    ctxTarget.strokeRect(30 * 6.25, 22 * 6.25, 4 * 6.25, 4 * 6.25);
+
     socket = io();
 
     canvasEdge = document.getElementById('edges');
@@ -155,12 +131,14 @@ function init() {
     ctxEdge.strokeStyle = 'black';
     ctxEdge.lineWidth = 1;
 
-    canvasPink = document.getElementById('pink');
-    ctxPink = canvasPink.getContext("2d");
-    ctxPink.fillStyle = 'rgba(255, 0, 255, 0.5)';
+    canvasBall = document.getElementById('ball');
+    ctxBall = canvasBall.getContext("2d");
+    ctxBall.strokeRect(30 * 6.25, 22 * 6.25, 4 * 6.25, 4 * 6.25);
+    ctxBall.fillStyle = 'rgba(255, 0, 255, 0.5)';
 
     socket.on('senseState', senseStateReceived);
 }
 
 init();
+
 </script>
