@@ -102,7 +102,7 @@ I am digging YUV format for image processing. It is not only easy to use, but th
 
 ##### Y Component
 
-The first part of the binary data of a `raspiyuv` capture is 3072 (64 x 48) 8-bit values (0x00 - 0xFF, or 0 - 255 in decimal) that represent the Y, or luma, component of the image where 0x00 is the darkest and 0xFF is the brightest value. This is what I am using for most of the image analysis.
+The first part of the binary data of a `raspiyuv` capture is 3072 (64 x 48) 8-bit values (0x00-0xFF, or 0-255 in decimal) that represent the Y, or luma, component of the image where 0x00 is the darkest and 0xFF is the brightest value. This is what I am using for most of the image analysis.
 
 ##### UV Component
 
@@ -112,7 +112,7 @@ The color information is 1/2 the resolution of the luma component. So in my exam
 
 ##### Convert to HSL
 
-When I started working with recognizing colors, it became quickly apparent that I needed a a mathematical representation of color in a way that makes sense to a human. YUV is an efficient way to communicate color to a machine, but not very useful when you want to identify things that are "red". Hue/Saturation/Luminance is a color scheme that makes more sense to people. I was unable to find any clear method to convert between the two even though it looks like there should be a simple relationship. Luckily [this article](http://www.quasimondo.com/archives/000696.php) pointed out what should have been obvious by just looking at the UV color space image above: If you draw a line from the origin to a (u, v) value, you get an arrow that points to a hue, and the length of that arrow is the saturation. I converted UV to a hue value of 0.0 - 1.0 like so:
+When I started working with recognizing colors, it became quickly apparent that I needed a a mathematical representation of color in a way that makes sense to a human. YUV is an efficient way to communicate color to a machine, but not very useful when you want to identify things that are "red". Hue/Saturation/Luminance is a color scheme that makes more sense to people. I was unable to find any clear method to convert between the two even though it looks like there should be a simple relationship. Luckily [this article](http://www.quasimondo.com/archives/000696.php) pointed out what should have been obvious by just looking at the UV color space image above: If you draw a line from the origin to a (u, v) value, you get an arrow that points to a hue, and the length of that arrow is the saturation. I converted UV value of 0-255 to a hue value of 0.0-1.0 like so:
 
     function uvToHue(u, v) {
         var normalU = (2 * u / 255) - 1.0,
