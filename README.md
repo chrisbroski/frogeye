@@ -25,7 +25,7 @@ What he discovered was that this middle layer of cells was doing significant vis
 * Contrast - These cells recognize edges.
 * "Bug" - These cells send a signal when a small, round, moving object enters the field of view.
 
-The frog's brain didn't need to makes sense of the world at all. The intermediate retinal cells were handling this in a very hard-wired way.
+The frog's brain didn't need to makes sense of the world at all. The intermediate retinal cells handled visual processing in a very hard-wired way.
 
 This looks nothing like a neural net. Co-author Walter Pitts was arguably the father of neural networks. After the frog paper was published he burned all of his work and drank himself to death.
 
@@ -46,17 +46,17 @@ The files *viewerserver.js* and *viewer.html* were built to make monitoring the 
 
 The *frogeye.js* module currently detects:
 
-1. Primary motion direction (left, center, right, or none)
+1. Overall brightness of the visual field
 2. Motion location in a 4 x 3 grid
-3. Overall brightness of the visual field
-4. Contrast in one of 3,072 points (64 x 48 grid)
+3. Contrast in one of 3,072 points (64 x 48 grid)
+4. Location of the color that is the closest match to a set target (32 x 24)
 
 The viewer shows visualizations of this data in a 400 x 300 display:
 
-1. Red arrows or a dot indicate primary motion direction
+1. Background color is proportional to overall brightness
 2. Translucent green squares represent motion location
-3. Background color is proportional to overall brightness
-4. Plus signs (\+) for areas of contrast
+3. Plus signs (\+) for areas of contrast
+4. Magenta dot for target color location
 
 ## Hardware
 
@@ -110,4 +110,15 @@ The color information is 1/2 the resolution of the luma component. So in my exam
 
 <img alt="UV color plane at Y=0.5" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/YUV_UV_plane.svg" title="By Tonyle - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=6977944" width="300" height="300">
 
-[More YUV info](http://softpixel.com/~cwright/programming/colorspace/yuv/)
+##### Convert to HSL
+
+When I started working with recognizing colors, it became quickly apparent that I needed a a mathematical representation of color in a way that makes sense to a human. YUV is an efficient way to communicate color to a machine, but not very useful when you want to identify things that are "red". Hue/Saturation/Luminance is a color scheme that makes more sense to people. I was unable to find any clear method to convert between the two even though it looks like there should be a simple relationship. Luckily [this article](http://www.quasimondo.com/archives/000696.php) pointed out what should have been obvious by just looking at the UV color space image above: If you draw a line from the origin to a (u, v) value, you get an arrow that points to a hue, and the length of that arrow is the saturation. I converted UV to a hue value of 0.0 - 1.0 like so:
+
+    function uvToHue(u, v) {
+        var normalU = (2 * u / 255) - 1.0,
+            normalV = (2 * v / 255) - 1.0;
+
+        return (Math.atan2(normalV, normalU) + Math.PI) / (Math.PI * 2);
+    }
+
+This is not exactly a hue (0.0 is green instead of red) but I don't think it matters for my application so I'm not going to worry too much about it right now.
