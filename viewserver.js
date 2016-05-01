@@ -11,6 +11,10 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/viewer.html');
 });
 
+app.get('/img/favicon.png', function (req, res) {
+    res.sendFile(__dirname + '/img/favicon.png');
+});
+
 function sendSenseData() {
     setInterval(function () {
         // send sense data to viewer 100x per second
