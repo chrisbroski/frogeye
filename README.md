@@ -1,6 +1,4 @@
-<img src="img/favicon.png" alt="" style="float: left; ">
-
-# frogeye.js
+# <img src="img/favicon.png" alt=""> frogeye.js
 
 I discovered the seminal 1959 paper "[What a Frog's Eye Tells a Frog's Brain](http://neuromajor.ucr.edu/courses/WhatTheFrogsEyeTellsTheFrogsBrain.pdf)" in a [Nautilus article on Walter Pitts](http://nautil.us/issue/21/information/the-man-who-tried-to-redeem-the-world-with-logic)
 
