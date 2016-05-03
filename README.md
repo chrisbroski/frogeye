@@ -4,7 +4,7 @@ I discovered the seminal 1959 paper "[What a Frog's Eye Tells a Frog's Brain](ht
 
 Mind == Blown.
 
-Not only was Walter a fascinating person, but the results of the frog eye study jibed with [my own work on AI](http://behaviorallogic.com/foundation). The powerful simplicity of image processing in a frog's retina inspired me to attempt to build a simulation.
+Not only was Walter a fascinating person, but the results of the frog eye study jibed with [my own work on AI](http://behaviorallogic.com/foundation). The powerful simplicity of image processing in a frog's retina inspired me to build a simulation.
 
 ## What Does a Frog's Eye Tell a Frog's Brain?
 
