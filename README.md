@@ -20,7 +20,7 @@ There was an intermediate layer of cells between the light-detecting ones and th
 
 What he discovered was that this middle layer of cells was doing significant visual processing. Among the types of visual analysis found were:
 
-* On/off - These cells signal if something in an area changes from light to dark or dark to light (signifying movement.)
+* On/off - These cells signal if something in an area changes from light to dark or dark to light (implying movement.)
 * Dimming - These cells fire when a large portion of the visible area suddenly gets darker.
 * Contrast - These cells recognize edges.
 * "Bug" - These cells send a signal when a small, round, moving object enters the field of view.
