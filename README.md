@@ -33,7 +33,9 @@ This looks nothing like a neural net. Co-author Walter Pitts was arguably the fa
 
 I decided to try to simulate on/off (movement) cells using a Raspberry Pi first. The file *[motion-overall.js](https://github.com/chrisbroski/frogeye/blob/master/motion-overall.js)* is a simple processor to measure total movement in the field of vision of a Pi camera.
 
-The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server broadcasts perception data to the HTML page using the [Socket.io](http://socket.io/) library. The viewer displays raw perception data numerically and visually.
+I implemented motion detection with location in 1 to 12 ares (4 x 3 grid) and contrast/edge detectors at 64 c 48 resolution. Dimming turned out to be much trickier that I had assumed, so I haven't done that yet. I also assumed that the bug detector will be difficult, so I instead made a detector that recognizes a specific predetermined color. I would like to adapt this work into a robot that chases a ball so as long as I use a ball has a color unique to its surroundings, that should probably be good enough.
+
+The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server broadcasts perception data to the HTML page using the [Socket.io](http://socket.io/) library. The server is not much more than a dumb pipe to send preception data to the viewer. The viewer displays the raw numbers and uses CSS and HTML5 canvas to display perception data visually.
 
 <img src="img/viewer_screenshot.png" alt="Frogeye viewer screenshot">
 
