@@ -51,7 +51,7 @@ function isEdge(ii, visionWidth, imgPixelSize, luma) {
 }
 
 function isTargetColor(hue, sat, targetHue, targetSat) {
-    return Math.abs(hue - targetHue) + Math.abs(sat - targetSat);
+    return Math.abs(hue - targetHue) + Math.abs(sat - targetSat) / 2;
 }
 
 // Tried to adapt this: http://www.quasimondo.com/archives/000696.php
@@ -114,14 +114,14 @@ function targetColorLocation(chroma, len) {
         hue,
         sat,
         colorDistance,
-        smallestColorDistance = 0.05,
+        smallestColorDistance = 0.03,
         ball = -1;
 
     for (ii = 0; ii < len; ii += 1) {
         hue = uvToHue(chroma.U[ii], chroma.V[ii]);
         sat = uvToSat(chroma.U[ii], chroma.V[ii]);
 
-        colorDistance = isTargetColor(hue, sat, 0.8, 0.3);
+        colorDistance = isTargetColor(hue, sat, 0.8, 0.35);
         if (colorDistance < smallestColorDistance) {
             smallestColorDistance = colorDistance;
             ball = ii;
