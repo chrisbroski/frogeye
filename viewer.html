@@ -58,8 +58,7 @@ h1 img {margin: 0 10px 0 0; vertical-align: middle; }
 var socket, canvasEdge, ctxEdge, canvasBall, ctxBall;
 
 function displayOverallBrightness(brightnessNormalized) {
-    var to8Bit = Math.floor(brightnessNormalized * 256),
-        brightnessAmplified = brightnessNormalized * 2.5,
+    var brightnessAmplified = brightnessNormalized + 0.1,
         rgbaShade,
         brightnessDiv = document.getElementById('brightness');
 
