@@ -123,4 +123,4 @@ When I started working with recognizing colors, it became quickly apparent that 
         return (Math.atan2(normalV, normalU) + Math.PI) / (Math.PI * 2);
     }
 
-This is not exactly a hue (0.0 is green instead of red) but I don't think it matters for my application so I'm not going to worry too much about it right now.
+Whenever I use `atan2` my result always seems to be off by 90 degrees from what I think it should be, and this result is no different. (Hue value 0.0 is green instead of red.) I don't think it matters for my application, as long as the number relates to a specific color so I'm not going to worry too much about it at the moment.
