@@ -8,7 +8,7 @@ Not only was Walter a fascinating person, but the results of the frog eye study 
 
 ## What Does a Frog's Eye Tell a Frog's Brain?
 
-The gist of the paper is that most people probably think that the eye works like a camera:
+The gist of the paper is that most people probably think that the vertebrate eye works like a camera:
 
 <img src="img/retina1.png" alt="camera eye">
 
