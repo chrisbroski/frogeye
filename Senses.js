@@ -30,6 +30,7 @@ function Senses(visionWidth, visionHeight) {
     // *Perceptions* are the results of processing raw sense state
     // They can only be written by perceivers, but can be read by anything
     state.perceptions = {
+        dimensions: [visionWidth, visionHeight],
         motionLocation: [],
         brightnessOverall: 0.0,
         centerColor: {"hue": 0, "saturation": 0},

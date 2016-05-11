@@ -43,6 +43,7 @@ h1 img {margin: 0 10px 0 0; vertical-align: middle; }
 
     <canvas id="edges" width="400" height="300"></canvas>
     <canvas id="ball" width="400" height="300"></canvas>
+    <!--<canvas id="target" width="400" height="300"></canvas>-->
 </div>
 
 <div id="state">
@@ -54,7 +55,7 @@ h1 img {margin: 0 10px 0 0; vertical-align: middle; }
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-var socket, canvasEdge, ctxEdge, canvasBall, ctxBall, viewWidth, mag, halfMag;
+var socket, canvasEdge, ctxEdge, canvasBall, ctxBall, viewWidth, viewHeight, mag, halfMag;
 
 function displayOverallBrightness(brightnessNormalized) {
     var brightnessAmplified = brightnessNormalized + 0.1,
@@ -85,17 +86,17 @@ function displayEdges(edges) {
     ctxEdge.clearRect(0, 0, canvasEdge.width, canvasEdge.height);
 
     edges.forEach(function (edge) {
-        var x = edge % viewWidth,
-            y = Math.floor(edge / viewWidth);
+        var x = edge % 64,
+            y = Math.floor(edge / 64);
 
         ctxEdge.beginPath();
-        ctxEdge.moveTo(x * mag - halfMag, y * mag);
-        ctxEdge.lineTo(x * mag + halfMag, y * mag);
+        ctxEdge.moveTo(x * 6.25 - 3.125, y * 6.25);
+        ctxEdge.lineTo(x * 6.25 + 3.125, y * 6.25);
         ctxEdge.stroke();
 
         ctxEdge.beginPath();
-        ctxEdge.moveTo(x * mag, y * mag - halfMag);
-        ctxEdge.lineTo(x * mag, y * mag + halfMag);
+        ctxEdge.moveTo(x * 6.25, y * 6.25 - 3.125);
+        ctxEdge.lineTo(x * 6.25, y * 6.25 + 3.125);
         ctxEdge.stroke();
     });
 }
@@ -105,28 +106,29 @@ function displayBall(loc) {
     ctxBall.clearRect(0, 0, canvasBall.width, canvasBall.height);
 
     if (loc > -1) {
-        x = (loc % (viewWidth / 2)) * 2;
-        y = Math.floor(loc / (viewWidth / 2)) * 2;
+        x = (loc % 32) * 2;
+        y = Math.floor(loc / 32) * 2;
 
         ctxBall.beginPath();
-        ctxBall.arc(x * mag, y * mag, 10, 0, Math.PI * 2, true);
+        ctxBall.arc(x * 6.25, y * 6.25, 10, 0, Math.PI * 2, true);
         ctxBall.closePath();
         ctxBall.fill();
     }
 }
 
-function setViewOptions(width) {
-    viewWidth = width;
-    mag = canvasEdge.width / width;
-    halfMag = mag / 2;
+function setViewOptions(dimensions) {
+    viewWidth = dimensions[0];
+    viewHeight = dimensions[1];
+    mag = canvasEdge.width / viewWidth;
+    halfMag = viewWidth / 2;
 }
 
 function senseStateReceived(senseState) {
     var jsonState = JSON.parse(senseState),
         jsonString = JSON.stringify(jsonState, null, '    ');
 
-    if (viewWidth !== jsonState.dimensions[0]) {
-        setViewOptions(jsonState.dimensions[0]);
+    if (viewWidth !== jsonState.dimensions[0] || viewHeight !== jsonState.dimensions[1]) {
+        setViewOptions(jsonState.dimensions);
     }
 
     document.getElementById('senseState').innerHTML = jsonString;
@@ -137,6 +139,11 @@ function senseStateReceived(senseState) {
 }
 
 function init() {
+    //var canvasTarget = document.getElementById('target'),
+    //    ctxTarget = canvasTarget.getContext("2d");
+
+    //ctxTarget.strokeRect(30 * 6.25, 22 * 6.25, 4 * 6.25, 4 * 6.25);
+
     socket = io();
 
     canvasEdge = document.getElementById('edges');
@@ -146,6 +153,7 @@ function init() {
 
     canvasBall = document.getElementById('ball');
     ctxBall = canvasBall.getContext("2d");
+    //ctxBall.strokeRect(30 * 6.25, 22 * 6.25, 4 * 6.25, 4 * 6.25);
     ctxBall.fillStyle = 'rgba(255, 0, 255, 0.5)';
 
     socket.on('senseState', senseStateReceived);
