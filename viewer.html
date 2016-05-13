@@ -27,6 +27,8 @@ h1 img {margin: 0 10px 0 0; vertical-align: middle; }
 }
 #brightness {background-color: #333; }
 #loc > div {width: 25%; height: 33.333%; float: left; }
+
+#testdata {position: absolute; top: 360px; }
 </style>
 
 <article>
@@ -50,11 +52,13 @@ h1 img {margin: 0 10px 0 0; vertical-align: middle; }
 <pre id="senseState"></pre>
 </div>
 
+<div id="testdata"></div>
+
 </article>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-var socket, canvasEdge, ctxEdge, canvasBall, ctxBall, viewWidth, mag, halfMag;
+var socket, canvasEdge, ctxEdge, canvasBall, ctxBall, viewWidth, mag, halfMag, frame = 0, lastDataFrame = -1;
 
 function displayOverallBrightness(brightnessNormalized) {
     var brightnessAmplified = brightnessNormalized + 0.1,
@@ -82,6 +86,7 @@ function displayMotionLocation(dir) {
 }
 
 function displayEdges(edges) {
+    console.time('edges');
     ctxEdge.clearRect(0, 0, canvasEdge.width, canvasEdge.height);
 
     edges.forEach(function (edge) {
@@ -98,6 +103,7 @@ function displayEdges(edges) {
         ctxEdge.lineTo(x * mag, y * mag + halfMag);
         ctxEdge.stroke();
     });
+    console.timeEnd('edges');
 }
 
 function displayBall(loc) {
@@ -122,18 +128,25 @@ function setViewOptions(width) {
 }
 
 function senseStateReceived(senseState) {
-    var jsonState = JSON.parse(senseState),
+    var jsonState = JSON.parse(senseState), jsonString;
+
+    // only update screen if data is new
+    if (jsonState.frame > lastDataFrame) {
         jsonString = JSON.stringify(jsonState, null, '    ');
 
-    if (viewWidth !== jsonState.dimensions[0]) {
-        setViewOptions(jsonState.dimensions[0]);
-    }
+        if (viewWidth !== jsonState.dimensions[0]) {
+            setViewOptions(jsonState.dimensions[0]);
+        }
 
-    document.getElementById('senseState').innerHTML = jsonString;
-    displayOverallBrightness(jsonState.brightnessOverall);
-    displayMotionLocation(jsonState.motionLocation);
-    displayEdges(jsonState.edges);
-    displayBall(jsonState.ball);
+        document.getElementById('senseState').innerHTML = jsonString;
+        displayOverallBrightness(jsonState.brightnessOverall);
+        displayMotionLocation(jsonState.motionLocation);
+        displayEdges(jsonState.edges);
+        displayBall(jsonState.ball);
+        document.getElementById('testdata').innerHTML = 'f: ' + frame + '; c: ' + jsonState.frame;
+        frame += 1;
+        lastDataFrame = jsonState.frame;
+    }
 }
 
 function init() {
@@ -149,6 +162,7 @@ function init() {
     ctxBall.fillStyle = 'rgba(255, 0, 255, 0.5)';
 
     socket.on('senseState', senseStateReceived);
+    //displayOverallBrightness(0.5);
 }
 
 init();
