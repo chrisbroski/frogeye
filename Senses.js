@@ -11,7 +11,8 @@ function Senses(visionWidth, visionHeight) {
         state = {},
         observers = {},
         perceivers = {},
-        attention = {};
+        attention = {},
+        partialImgData = '';
 
     // *Sense state* is a collection of all current sensory data.
     state.raw = {
@@ -65,10 +66,19 @@ function Senses(visionWidth, visionHeight) {
             chromaV = [],
             ii;
 
-        // Sensor data validation, if needed
+        // The Pi camera gives a lot of crap data in yuv time lapse mode.
+        // This is an attempt to recover some of it
         if (yuvData.length < imgRawFileSize - 1) {
-            console.log('Incorrect image file size: ' + yuvData.length);
+            console.log('Partial img data chunk: ' + yuvData.length);
+            if (yuvData.length + partialImgData.length === imgRawFileSize) {
+                yuvData = Buffer.concat([partialImgData, yuvData], imgRawFileSize);
+            } else {
+                partialImgData = yuvData;
+                console.log('Reassembled partial data.');
+            }
             return;
+        } else {
+            partialImgData = '';
         }
 
         // Data conversion. In this case an array is built from part of a binary buffer.

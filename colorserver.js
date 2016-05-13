@@ -8,7 +8,8 @@ var app = require('express')(),
     senseState = {},
     imgPixelSize = 64 * 48,
     imgRawFileSize = imgPixelSize * 1.5,
-    rawYuv = {y: [], u: [], v: []};
+    rawYuv = {y: [], u: [], v: []},
+    partialImgData = '';
 
 senseState.centerColor = {hsl: {hue: 0.0, saturation: 0.0}, yuv: {y: 0, u: 0, v: 0}};
 senseState.targetColor = {hue: 0.0, saturation: 0.0};
@@ -18,7 +19,7 @@ function getCenterColor(y, u, v) {
     var centerU = (u[367] + u[368] + u[399] + u[400]) / 4,
         centerV = (v[367] + v[368] + v[399] + v[400]) / 4,
         centerY = (y[1536]);
-    console.log(y.length);
+    //console.log(y.length);
     //return [uvToHue(centerU, centerV), uvToSat(centerU, centerV)];
     return [centerY, centerU, centerV]
 }
@@ -37,11 +38,21 @@ function setCenterColor(rawYuv) {
 function processData(yuvData) {
     var ii;
 
-    // Sensor data validation, if needed
+    // The Pi camera gives a lot of crap data in yuv time lapse mode.
+    // This is an attempt to recover some of it
     if (yuvData.length < imgRawFileSize - 1) {
-        console.log('Incorrect image file size: ' + yuvData.length);
+        console.log('Partial img data chunk: ' + yuvData.length);
+        if (yuvData.length + partialImgData.length === imgRawFileSize) {
+            yuvData = Buffer.concat([partialImgData, yuvData], imgRawFileSize);
+        } else {
+            partialImgData = yuvData;
+            console.log('Reassembled partial data.');
+        }
         return;
+    } else {
+        partialImgData = '';
     }
+
     rawYuv.y.length = 0;
     rawYuv.u.length = 0;
     rawYuv.v.length = 0;
@@ -58,24 +69,11 @@ function processData(yuvData) {
     }
 
     setCenterColor(rawYuv);
-
-    // Set raw global sense state
-    /*state.raw.luma.previous = state.raw.luma.current;
-    state.raw.luma.current = lumaData;
-    state.raw.chroma.U = chromaU;
-    state.raw.chroma.V = chromaV;*/
-
-    /*
-    Perceivers should typically be handled by the attention object, but for simplicity
-    we'll just fire it off after the observer completes.
-    */
-    //perceivers.frogEye(imgPixelSize);
 }
 
 function takePic() {
     var cam;
 
-    //timeLapseInterval = timeLapseInterval || 0;
     cam = spawn('raspiyuv', [
         '-w', 64,
         '-h', 48,
@@ -107,7 +105,6 @@ app.get('/', function (req, res) {
 
 function sendSenseData() {
     setInterval(function () {
-        // send color data to viewer
         io.emit('senseState', JSON.stringify(senseState));
     }, 200);
 }
