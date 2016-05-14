@@ -32,7 +32,6 @@ function Senses(visionWidth, visionHeight) {
     // They can only be written by perceivers, but can be read by anything
     state.perceptions = {
         dimensions: [visionWidth, visionHeight],
-        frame: 0,
         motionLocation: [],
         brightnessOverall: 0.0,
         centerColor: {"hue": 0, "saturation": 0},
@@ -60,7 +59,7 @@ function Senses(visionWidth, visionHeight) {
     };
 
     // *Observers* populate raw sense state from a creature's sensors.
-    observers.luma = function (yuvData, imgRawFileSize, imgPixelSize) {
+    observers.vision = function (yuvData, imgRawFileSize, imgPixelSize) {
         var lumaData = [],
             chromaU = [],
             chromaV = [],
@@ -126,9 +125,7 @@ function Senses(visionWidth, visionHeight) {
         ]);
 
         cam.stdout.on('data', function (data) {
-            observers.luma(data, imgRawFileSize, imgPixelSize);
-            //console.log(state.perceptions.frame);
-            state.perceptions.frame += 1;
+            observers.vision(data, imgRawFileSize, imgPixelSize);
         });
 
         cam.stderr.on('data', function (data) {

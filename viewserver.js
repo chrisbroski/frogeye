@@ -17,7 +17,7 @@ app.get('/img/favicon.png', function (req, res) {
 
 function sendSenseData() {
     setInterval(function () {
-        // send sense data to viewer 20x per second
+        // send sense data to viewer 10x per second
         io.emit('senseState', JSON.stringify(senses.senseState()));
     }, 100);
 }

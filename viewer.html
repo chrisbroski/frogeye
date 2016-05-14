@@ -58,7 +58,21 @@ h1 img {margin: 0 10px 0 0; vertical-align: middle; }
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-var socket, canvasEdge, ctxEdge, canvasBall, ctxBall, viewWidth, mag, halfMag, frame = 0, lastDataFrame = -1;
+var socket, canvasEdge, ctxEdge, canvasBall, ctxBall, viewWidth, mag, halfMag, stateHash = 0;
+
+/* From http://stackoverflow.com/questions/7616461#answer-7616484 */
+function hashCode(s) {
+    var hash = 0, i, chr, len = s.length;
+    if (len === 0) {
+        return hash;
+    }
+    for (i = 0; i < len; i++) {
+        chr = s.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
 
 function displayOverallBrightness(brightnessNormalized) {
     var brightnessAmplified = brightnessNormalized + 0.1,
@@ -126,12 +140,13 @@ function setViewOptions(width) {
 }
 
 function senseStateReceived(senseState) {
-    var jsonState = JSON.parse(senseState), jsonString;
-
-    // only update screen if data is new
-    if (jsonState.frame > lastDataFrame) {
+    var jsonState = JSON.parse(senseState),
         jsonString = JSON.stringify(jsonState, null, '    ');
 
+    // only update screen if data is new
+    if (hashCode(jsonString) !== stateHash) {
+        stateHash = hashCode(jsonString);
+        // Handle image dimension change
         if (viewWidth !== jsonState.dimensions[0]) {
             setViewOptions(jsonState.dimensions[0]);
         }
@@ -141,9 +156,6 @@ function senseStateReceived(senseState) {
         displayMotionLocation(jsonState.motionLocation);
         displayEdges(jsonState.edges);
         displayBall(jsonState.ball);
-        document.getElementById('testdata').innerHTML = 'f: ' + frame + '; c: ' + jsonState.frame;
-        frame += 1;
-        lastDataFrame = jsonState.frame;
     }
 }
 
@@ -160,7 +172,6 @@ function init() {
     ctxBall.fillStyle = 'rgba(255, 0, 255, 0.5)';
 
     socket.on('senseState', senseStateReceived);
-    //displayOverallBrightness(0.5);
 }
 
 init();
