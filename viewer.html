@@ -101,12 +101,13 @@ function displayEdges(edges) {
     edges.forEach(function (edge) {
         var x = (edge % 64) * mag,
             y = (Math.floor(edge / 64)) * mag,
-            gradient = ctxEdge.createRadialGradient(x, y, 0, x, y, mag);
+            gradient = ctxEdge.createRadialGradient(x, y, 0, x, y, mag * 1.5);
 
         ctxEdge.beginPath();
         gradient.addColorStop(0, 'black');
+        gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.1)');
         gradient.addColorStop(1, 'transparent');
-        ctxEdge.arc(x, y, mag, 0, 2 * Math.PI);
+        ctxEdge.arc(x, y, mag * 1.5, 0, 2 * Math.PI);
 
         ctxEdge.fillStyle = gradient;
         ctxEdge.fill();
