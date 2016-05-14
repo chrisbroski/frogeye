@@ -99,10 +99,19 @@ function displayEdges(edges) {
     ctxEdge.clearRect(0, 0, canvasEdge.width, canvasEdge.height);
 
     edges.forEach(function (edge) {
-        var x = edge % viewWidth,
-            y = Math.floor(edge / viewWidth);
+        var x = (edge % 64) * mag,
+            y = (Math.floor(edge / 64)) * mag,
+            gradient = ctxEdge.createRadialGradient(x, y, 0, x, y, mag);
 
         ctxEdge.beginPath();
+        gradient.addColorStop(0, 'black');
+        gradient.addColorStop(1, 'transparent');
+        ctxEdge.arc(x, y, mag, 0, 2 * Math.PI);
+
+        ctxEdge.fillStyle = gradient;
+        ctxEdge.fill();
+
+        /*ctxEdge.beginPath();
         ctxEdge.moveTo(x * mag - halfMag, y * mag);
         ctxEdge.lineTo(x * mag + halfMag, y * mag);
         ctxEdge.stroke();
@@ -110,7 +119,7 @@ function displayEdges(edges) {
         ctxEdge.beginPath();
         ctxEdge.moveTo(x * mag, y * mag - halfMag);
         ctxEdge.lineTo(x * mag, y * mag + halfMag);
-        ctxEdge.stroke();
+        ctxEdge.stroke();*/
     });
 }
 
