@@ -117,7 +117,7 @@ function Senses(visionWidth, visionHeight) {
             '-w', visionWidth.toString(10),
             '-h', visionHeight.toString(10),
             '-p', '50, 80, 400, 300', // small preview window
-            '-bm',
+            '-bm', // Burst mode
             '-vf', // My camera is upside-down so flip the image vertically
             '-tl', timeLapseInterval.toString(10), // 0 = as fast as possible
             '-t', '300000', // Restart every 5 min
