@@ -86,7 +86,6 @@ function displayMotionLocation(dir) {
 }
 
 function displayEdges(edges) {
-    console.time('edges');
     ctxEdge.clearRect(0, 0, canvasEdge.width, canvasEdge.height);
 
     edges.forEach(function (edge) {
@@ -103,7 +102,6 @@ function displayEdges(edges) {
         ctxEdge.lineTo(x * mag, y * mag + halfMag);
         ctxEdge.stroke();
     });
-    console.timeEnd('edges');
 }
 
 function displayBall(loc) {

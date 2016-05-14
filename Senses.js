@@ -51,7 +51,6 @@ function Senses(visionWidth, visionHeight) {
     // *Perceivers* process raw sense state into meaningful information
     perceivers.frogEye = function (imgPixelSize) {
         var frogView = frogeye(state.raw.luma, state.raw.chroma, imgPixelSize, visionWidth, 20);
-
         state.perceptions.brightnessOverall = frogView.brightness;
         state.perceptions.motionLocation = frogView.moveLocation;
         state.perceptions.edges = frogView.edges;
@@ -70,14 +69,14 @@ function Senses(visionWidth, visionHeight) {
         // The Pi camera gives a lot of crap data in yuv time lapse mode.
         // This is an attempt to recover some of it
         if (yuvData.length < imgRawFileSize - 1) {
-            console.log('Partial img data chunk: ' + yuvData.length);
+            //console.log('Partial img data chunk: ' + yuvData.length);
             if (yuvData.length + partialImgData.length === imgRawFileSize) {
                 yuvData = Buffer.concat([partialImgData, yuvData], imgRawFileSize);
             } else {
                 partialImgData = yuvData;
-                console.log('Reassembled partial data.');
+                return;
+                //console.log('Reassembled partial data.');
             }
-            return;
         }
         partialImgData = '';
 
@@ -128,7 +127,7 @@ function Senses(visionWidth, visionHeight) {
 
         cam.stdout.on('data', function (data) {
             observers.luma(data, imgRawFileSize, imgPixelSize);
-            console.log(state.perceptions.frame);
+            //console.log(state.perceptions.frame);
             state.perceptions.frame += 1;
         });
 
