@@ -110,16 +110,6 @@ function displayEdges(edges) {
 
         ctxEdge.fillStyle = gradient;
         ctxEdge.fill();
-
-        /*ctxEdge.beginPath();
-        ctxEdge.moveTo(x * mag - halfMag, y * mag);
-        ctxEdge.lineTo(x * mag + halfMag, y * mag);
-        ctxEdge.stroke();
-
-        ctxEdge.beginPath();
-        ctxEdge.moveTo(x * mag, y * mag - halfMag);
-        ctxEdge.lineTo(x * mag, y * mag + halfMag);
-        ctxEdge.stroke();*/
     });
 }
 
@@ -169,8 +159,6 @@ function init() {
 
     canvasEdge = document.getElementById('edges');
     ctxEdge = canvasEdge.getContext("2d");
-    ctxEdge.strokeStyle = 'black';
-    ctxEdge.lineWidth = 1;
 
     canvasBall = document.getElementById('ball');
     ctxBall = canvasBall.getContext("2d");
