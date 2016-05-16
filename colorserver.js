@@ -12,8 +12,84 @@ var app = require('express')(),
     partialImgData = '';
 
 senseState.centerColor = {hsl: {hue: 0.0, saturation: 0.0}, yuv: {y: 0, u: 0, v: 0}};
-senseState.targetColor = {hue: 0.0, saturation: 0.0};
-senseState.targetsFound = [];
+senseState.targetColor = {hue: 0.24, saturation: 0.077};
+senseState.targetFound = -1;
+senseState.edges = [];
+
+function isEdge(ii, visionWidth, imgPixelSize, luma) {
+    var val = luma[ii], compare, difference = 50;
+    // check top, right, bottom, and left for a significant increase in luma
+
+    // Top
+    if (ii > visionWidth) {
+        compare = luma[ii - visionWidth];
+        if (compare - val > difference) {
+            return true;
+        }
+    }
+
+    // Bottom
+    if (ii < imgPixelSize - visionWidth) {
+        compare = luma[ii + visionWidth];
+        if (compare - val > difference) {
+            return true;
+        }
+    }
+
+    // Left
+    if (ii % visionWidth > 0) {
+        compare = luma[ii - 1];
+        if (compare - val > difference) {
+            return true;
+        }
+    }
+
+    // Right
+    if (ii % visionWidth < visionWidth - 1) {
+        compare = luma[ii + 1];
+        if (compare - val > difference) {
+            return true;
+        }
+    }
+}
+
+function findEdges(luma, len, visionWidth, changeAmount) {
+    var ii,
+        contrast = [];
+
+    for (ii = 0; ii < len; ii += 1) {
+        if (isEdge(ii, visionWidth, len, luma)) {
+            contrast.push(ii);
+        }
+    }
+
+    senseState.edges = contrast;
+}
+
+// Tried to adapt this: http://www.quasimondo.com/archives/000696.php
+function uvToHue(u, v) {
+    var angle;
+
+    // first, get u and v into the -1.0 to 1.0 range for some trig
+    var normalU = (-2 * u / 255) + 1.0,
+        normalV = (2 * v / 255) - 1.0;
+
+    // atan2 is a super useful trig function to get an angle -pi to pi
+    angle = Math.atan2(normalU, normalV);
+    if (angle < 0) {
+        angle = Math.PI * 2 + angle;
+    }
+
+    // Then normalize the value to 0.0 - 1.0
+    return angle / (Math.PI * 2);
+}
+
+function uvToSat(u, v) {
+    var normalU = (2 * u / 255) - 1.0,
+        normalV = (2 * v / 255) - 1.0;
+
+    return Math.sqrt(normalU * normalU + normalV * normalV);
+}
 
 function getCenterColor(y, u, v) {
     var centerU = (u[367] + u[368] + u[399] + u[400]) / 4,
@@ -26,13 +102,46 @@ function getCenterColor(y, u, v) {
 
 function setCenterColor(rawYuv) {
     var centerColor = getCenterColor(rawYuv.y, rawYuv.u, rawYuv.v);
-    //senseState.centerColor.yuv.y = rawYuv.y;
+
     senseState.centerColor.yuv.y = centerColor[0];
     senseState.centerColor.yuv.u = centerColor[1];
     senseState.centerColor.yuv.v = centerColor[2];
 
-    //console.log(JSON.stringify(senseState));
-    console.log(senseState);
+    senseState.centerColor.hsl.hue = uvToHue(centerColor[1], centerColor[2]);
+    senseState.centerColor.hsl.saturation = uvToSat(centerColor[1], centerColor[2]);
+}
+
+function isTargetColor(hue, sat, targetHue, targetSat) {
+    var dist = hue - targetHue;
+    // check for distance
+    /*if (Math.abs(dist + 1.0) < Math.abs(dist)) {
+        dist = dist + 1.0;
+    }*/
+
+    return Math.abs(dist) + Math.abs(sat - targetSat) / 2;
+}
+
+function targetColorLocation(u, v, len) {
+    var ii,
+        hue,
+        sat,
+        colorDistance,
+        smallestColorDistance = 0.03,
+        ball = -1;
+
+    for (ii = 0; ii < len; ii += 1) {
+        hue = uvToHue(u[ii], v[ii]);
+        sat = uvToSat(u[ii], v[ii]);
+
+        colorDistance = isTargetColor(hue, sat, senseState.targetColor.hue, senseState.targetColor.saturation);
+        if (colorDistance < smallestColorDistance) {
+            smallestColorDistance = colorDistance;
+            ball = ii;
+        }
+    }
+    //console.log(ball);
+
+    senseState.targetFound = ball;
 }
 
 function processData(yuvData) {
@@ -47,8 +156,8 @@ function processData(yuvData) {
         } else {
             partialImgData = yuvData;
             console.log('Reassembled partial data.');
+            return;
         }
-        return;
     } else {
         partialImgData = '';
     }
@@ -68,7 +177,9 @@ function processData(yuvData) {
         rawYuv.v.push(yuvData.readUInt8(ii));
     }
 
+    findEdges(rawYuv.y, imgPixelSize, 64, 20);
     setCenterColor(rawYuv);
+    targetColorLocation(rawYuv.u, rawYuv.v, imgPixelSize / 4);
 }
 
 function takePic() {
@@ -78,6 +189,7 @@ function takePic() {
         '-w', 64,
         '-h', 48,
         '-p', '50, 80, 400, 300', // small preview window
+        '-bm', // Burst mode
         '-vf', // My camera is upside-down so flip the image vertically
         '-tl', '500', // 0 = as fast as possible
         '-t', '300000', // Restart every 5 min
