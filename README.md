@@ -1,14 +1,14 @@
 # <img src="img/favicon.png" alt=""> frogeye.js
 
-I discovered the seminal 1959 paper "[What a Frog's Eye Tells a Frog's Brain](http://neuromajor.ucr.edu/courses/WhatTheFrogsEyeTellsTheFrogsBrain.pdf)" in a [Nautilus article on Walter Pitts](http://nautil.us/issue/21/information/the-man-who-tried-to-redeem-the-world-with-logic)
+I discovered the seminal 1959 paper "[What a Frog's Eye Tells a Frog's Brain](http://neuromajor.ucr.edu/courses/WhatTheFrogsEyeTellsTheFrogsBrain.pdf)" in a [article on Walter Pitts](http://nautil.us/issue/21/information/the-man-who-tried-to-redeem-the-world-with-logic)
 
 Mind == Blown.
 
-Not only was Walter a fascinating person, but the results of the frog eye study jibed with [my own work on AI](http://behaviorallogic.com/foundation). The powerful simplicity of image processing in a frog's retina inspired me to attempt to build a simulation.
+Not only was Walter a fascinating person, but the results of the frog eye study jibed with [my own work on AI](http://behaviorallogic.com/foundation). The powerful simplicity of image processing in a frog's retina inspired me to build a similar type of image processor.
 
 ## What Does a Frog's Eye Tell a Frog's Brain?
 
-The gist of the paper is that most people probably think that the eye works like a camera:
+The gist of the paper is that most people probably think that the vertebrate eye works like a camera:
 
 <img src="img/retina1.png" alt="camera eye">
 
@@ -20,7 +20,7 @@ There was an intermediate layer of cells between the light-detecting ones and th
 
 What he discovered was that this middle layer of cells was doing significant visual processing. Among the types of visual analysis found were:
 
-* On/off - These cells signal if something in an area changes from light to dark or dark to light (signifying movement.)
+* On/off - These cells signal if something in an area changes from light to dark or dark to light (implying movement.)
 * Dimming - These cells fire when a large portion of the visible area suddenly gets darker.
 * Contrast - These cells recognize edges.
 * "Bug" - These cells send a signal when a small, round, moving object enters the field of view.
@@ -33,7 +33,9 @@ This looks nothing like a neural net. Co-author Walter Pitts was arguably the fa
 
 I decided to try to simulate on/off (movement) cells using a Raspberry Pi first. The file *[motion-overall.js](https://github.com/chrisbroski/frogeye/blob/master/motion-overall.js)* is a simple processor to measure total movement in the field of vision of a Pi camera.
 
-The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server broadcasts perception data to the HTML page using the [Socket.io](http://socket.io/) library. The viewer displays raw perception data numerically and visually.
+In [frogeye.js](https://github.com/chrisbroski/frogeye/blob/master/frogeye.js) I implemented motion detection specific to 12 locations (4 x 3 grid) and contrast/edge detectors at 64 x 48 resolution. Dimming turned out to be much trickier that I had assumed, so I haven't done that yet. I also assumed that the bug detector will be difficult, so I instead made a detector that recognizes a specific predetermined color. I would like to adapt this work into a robot that chases a ball so as long as I use a ball of a color unique to its surroundings, that should probably be good enough.
+
+The files *viewerserver.js* and *viewer.html* were built to make monitoring the visual processors easier and more fun. The server broadcasts perception data to the HTML page using the [Socket.io](http://socket.io/) library. The server is not much more than a dumb pipe to send preception data to the viewer. The viewer displays the raw numbers and uses CSS and HTML5 canvas to display perception data visually.
 
 <img src="img/viewer_screenshot.png" alt="Frogeye viewer screenshot">
 
@@ -123,4 +125,4 @@ When I started working with recognizing colors, it became quickly apparent that 
         return (Math.atan2(normalV, normalU) + Math.PI) / (Math.PI * 2);
     }
 
-This is not exactly a hue (0.0 is green instead of red) but I don't think it matters for my application so I'm not going to worry too much about it right now.
+Whenever I use `atan2` my result always seems to be off by 90 degrees from what I think it should be, and this result is no different. (Hue value 0.0 is green instead of red.) I don't think it matters for my application, as long as the number relates to a specific color so I'm not going to worry too much about it at the moment.
