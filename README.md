@@ -76,7 +76,9 @@ I recommend getting started using Node.js on the Raspberry Pi with this [AdaFrui
 
 ### [Atom.io](http://atom.io/)
 
-I am using GitHub's Atom.io code editor on Mac to write the JavaScript. I recommend the [remote-atom](https://atom.io/packages/remote-atom) plugin to easily sync the code files to the Raspberry Pi.
+I am using GitHub's Atom.io code editor on Mac to write the JavaScript. I recommend the [remote-atom](https://atom.io/packages/remote-atom) plugin to easily sync the code files to the Raspberry Pi. Use ratom to ssh in like so:
+
+    ssh -R 52698:localhost:52698 pi@raspberrypi
 
 ## Performance
 
