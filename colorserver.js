@@ -1,4 +1,4 @@
-/*jslint node: true */
+/*jslint node: true, sloppy: true */
 
 var app = require('express')(),
     http = require('http').Server(app),
@@ -53,7 +53,7 @@ function isEdge(ii, visionWidth, imgPixelSize, luma) {
     }
 }
 
-function findEdges(luma, len, visionWidth, changeAmount) {
+function findEdges(luma, len, visionWidth) {
     var ii,
         contrast = [];
 
@@ -68,10 +68,10 @@ function findEdges(luma, len, visionWidth, changeAmount) {
 
 // Tried to adapt this: http://www.quasimondo.com/archives/000696.php
 function uvToHue(u, v) {
-    var angle;
+    var angle,
 
-    // first, get u and v into the -1.0 to 1.0 range for some trig
-    var normalU = (-2 * u / 255) + 1.0,
+        // first, get u and v into the -1.0 to 1.0 range for some trig
+        normalU = (-2 * u / 255) + 1.0,
         normalV = (2 * v / 255) - 1.0;
 
     // atan2 is a super useful trig function to get an angle -pi to pi
@@ -97,7 +97,7 @@ function getCenterColor(y, u, v) {
         centerY = (y[1536]);
     //console.log(y.length);
     //return [uvToHue(centerU, centerV), uvToSat(centerU, centerV)];
-    return [centerY, centerU, centerV]
+    return [centerY, centerU, centerV];
 }
 
 function setCenterColor(rawYuv) {
@@ -144,17 +144,17 @@ function targetColorLocation(u, v, len) {
     senseState.targetFound = ball;
 }
 
-function processData(yuvData) {
+function convertImageData(imgData) {
     var ii;
 
     // The Pi camera gives a lot of crap data in yuv time lapse mode.
     // This is an attempt to recover some of it
-    if (yuvData.length < imgRawFileSize - 1) {
-        console.log('Partial img data chunk: ' + yuvData.length);
-        if (yuvData.length + partialImgData.length === imgRawFileSize) {
-            yuvData = Buffer.concat([partialImgData, yuvData], imgRawFileSize);
+    if (imgData.length < imgRawFileSize - 1) {
+        console.log('Partial img data chunk: ' + imgData.length);
+        if (imgData.length + partialImgData.length === imgRawFileSize) {
+            imgData = Buffer.concat([partialImgData, imgData], imgRawFileSize);
         } else {
-            partialImgData = yuvData;
+            partialImgData = imgData;
             console.log('Reassembled partial data.');
             return;
         }
@@ -168,14 +168,18 @@ function processData(yuvData) {
 
     // Data conversion. In this case an array is built from part of a binary buffer.
     for (ii = 0; ii < imgPixelSize; ii += 1) {
-        rawYuv.y.push(yuvData.readUInt8(ii));
+        rawYuv.y.push(imgData.readUInt8(ii));
     }
     for (ii = imgPixelSize; ii < imgPixelSize * 1.25; ii += 1) {
-        rawYuv.u.push(yuvData.readUInt8(ii));
+        rawYuv.u.push(imgData.readUInt8(ii));
     }
     for (ii = imgPixelSize * 1.25; ii < imgPixelSize * 1.5; ii += 1) {
-        rawYuv.v.push(yuvData.readUInt8(ii));
+        rawYuv.v.push(imgData.readUInt8(ii));
     }
+}
+
+function processData(yuvData) {
+    convertImageData(yuvData);
 
     findEdges(rawYuv.y, imgPixelSize, 64, 20);
     setCenterColor(rawYuv);
@@ -229,6 +233,13 @@ io.on('connection', function (socket) {
 
     socket.on('disconnect', function () {
         console.log('Color viewer client disconnected');
+    });
+
+    socket.on('set target', function (val) {
+        var targetColor = JSON.parse(val);
+        console.log('target set');
+        senseState.targetColor.hue = targetColor.h;
+        senseState.targetColor.saturation = targetColor.s;
     });
 });
 

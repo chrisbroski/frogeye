@@ -17,6 +17,7 @@ h1 img {margin: 0 10px 0 0; vertical-align: middle; }
     position: absolute;
     top: 0; right: 0; bottom: 0; left: 0;
 }
+#frogeye #target {width: 20px; height: 20px; border: 1px solid #000; position: absolute; left: 190px; top: 140px; }
 #state {
     padding: 0 1em;
     width: 400px;
@@ -35,7 +36,7 @@ h1 img {margin: 0 10px 0 0; vertical-align: middle; }
 <div id="frogeye">
     <canvas id="edges" width="400" height="300"></canvas>
     <canvas id="ball" width="400" height="300"></canvas>
-    <canvas id="target" width="400" height="300"></canvas>
+    <div id="target"></div>
 </div>
 
 <div id="state">
@@ -45,13 +46,14 @@ h1 img {margin: 0 10px 0 0; vertical-align: middle; }
 
 <div id="colorInfo">
 <div></div>
+<p><button id="setTarget">Set target color</button>
 </div>
 
 </article>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-var socket, canvasEdge, ctxEdge, canvasBall, ctxBall, mag, halfMag;
+var socket, canvasEdge, ctxEdge, canvasBall, ctxBall, mag, halfMag, targetColor = {h: 0, s: 0};
 
 function displayEdges(edges) {
     ctxEdge.clearRect(0, 0, canvasEdge.width, canvasEdge.height);
@@ -104,13 +106,20 @@ function senseStateReceived(senseState) {
     displayEdges(jsonState.edges);
     displayBall(jsonState.targetFound);
     displayColor(jsonState.centerColor.hsl);
+    targetColor.h = jsonState.centerColor.hsl.hue;
+    targetColor.s = jsonState.centerColor.hsl.saturation;
+}
+
+function setTarget() {
+    console.log(targetColor);
+    socket.emit('set target', JSON.stringify(targetColor));
 }
 
 function init() {
-    var canvasTarget = document.getElementById('target'),
-        ctxTarget = canvasTarget.getContext("2d");
+    //var canvasTarget = document.getElementById('target'),
+    //    ctxTarget = canvasTarget.getContext("2d");
 
-    ctxTarget.strokeRect(30 * mag, 22 * mag, 4 * mag, 4 * mag);
+    //ctxTarget.strokeRect(30 * mag, 22 * mag, 4 * mag, 4 * mag);
 
     mag = 400 / 64;
     halfMag = mag / 2;
@@ -126,6 +135,7 @@ function init() {
     ctxBall.fillStyle = 'rgba(255, 0, 255, 0.5)';
 
     socket.on('senseState', senseStateReceived);
+    document.getElementById('setTarget').onclick = setTarget;
 }
 
 init();
