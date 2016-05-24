@@ -12,8 +12,8 @@ var app = require('express')(),
     partialImgData = '';
 
 senseState.centerColor = {hsl: {hue: 0.0, saturation: 0.0}, yuv: {y: 0, u: 0, v: 0}};
-senseState.targetColor = {hue: 0.24, saturation: 0.077};
-senseState.targetFound = -1;
+senseState.targetColor = {hue: 0.015, saturation: 0.124};
+senseState.targets = [];
 senseState.edges = [];
 
 function isEdge(ii, visionWidth, imgPixelSize, luma) {
@@ -95,8 +95,7 @@ function getCenterColor(y, u, v) {
     var centerU = (u[367] + u[368] + u[399] + u[400]) / 4,
         centerV = (v[367] + v[368] + v[399] + v[400]) / 4,
         centerY = (y[1536]);
-    //console.log(y.length);
-    //return [uvToHue(centerU, centerV), uvToSat(centerU, centerV)];
+
     return [centerY, centerU, centerV];
 }
 
@@ -111,37 +110,36 @@ function setCenterColor(rawYuv) {
     senseState.centerColor.hsl.saturation = uvToSat(centerColor[1], centerColor[2]);
 }
 
-function isTargetColor(hue, sat, targetHue, targetSat) {
-    var dist = hue - targetHue;
-    // check for distance
-    /*if (Math.abs(dist + 1.0) < Math.abs(dist)) {
-        dist = dist + 1.0;
-    }*/
-
-    return Math.abs(dist) + Math.abs(sat - targetSat) / 2;
+function getLumaFromUV(uvIndex) {
+    //
+    return 255;
 }
 
-function targetColorLocation(u, v, len) {
+function targetColorLocations(u, v, len) {
     var ii,
-        hue,
-        sat,
-        colorDistance,
-        smallestColorDistance = 0.03,
-        ball = -1;
+        luma,
+        lumaTolerance = 50,
+        hueTolerance = 0.02,
+        satTolerance = 0.30,
+        hueDif,
+        satDif,
+        hits = [];
 
     for (ii = 0; ii < len; ii += 1) {
-        hue = uvToHue(u[ii], v[ii]);
-        sat = uvToSat(u[ii], v[ii]);
-
-        colorDistance = isTargetColor(hue, sat, senseState.targetColor.hue, senseState.targetColor.saturation);
-        if (colorDistance < smallestColorDistance) {
-            smallestColorDistance = colorDistance;
-            ball = ii;
+        // if luma is too dark, ignore
+        if (getLumaFromUV(ii) > lumaTolerance) {
+            hueDif = Math.abs(uvToHue(u[ii], v[ii]) - senseState.targetColor.hue);
+            if (hueDif > 0.5) {
+                hueDif = Math.abs(hueDif - 1.0);
+            }
+            satDif = Math.abs(uvToSat(u[ii], v[ii]) - senseState.targetColor.saturation);
+            if (hueDif <= hueTolerance && satDif <= satTolerance) {
+                hits.push(ii);
+            }
         }
     }
-    //console.log(ball);
 
-    senseState.targetFound = ball;
+    senseState.targets = hits;
 }
 
 function convertImageData(imgData) {
@@ -183,7 +181,7 @@ function processData(yuvData) {
 
     findEdges(rawYuv.y, imgPixelSize, 64, 20);
     setCenterColor(rawYuv);
-    targetColorLocation(rawYuv.u, rawYuv.v, imgPixelSize / 4);
+    targetColorLocations(rawYuv.u, rawYuv.v, imgPixelSize / 4);
 }
 
 function takePic() {
