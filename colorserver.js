@@ -12,7 +12,7 @@ var app = require('express')(),
     partialImgData = '';
 
 senseState.centerColor = {hsl: {hue: 0.0, saturation: 0.0}, yuv: {y: 0, u: 0, v: 0}};
-senseState.targetColor = {hue: 0.015, saturation: 0.124};
+senseState.targetColor = {hue: 0.056, saturation: 0.81};
 senseState.targets = [];
 senseState.edges = [];
 
@@ -119,8 +119,8 @@ function targetColorLocations(u, v, len) {
     var ii,
         luma,
         lumaTolerance = 50,
-        hueTolerance = 0.02,
-        satTolerance = 0.30,
+        hueTolerance = 0.03,
+        satTolerance = 0.20,
         hueDif,
         satDif,
         hits = [];
@@ -193,7 +193,7 @@ function takePic() {
         '-p', '50, 80, 400, 300', // small preview window
         '-bm', // Burst mode
         '-vf', // My camera is upside-down so flip the image vertically
-        '-tl', '500', // 0 = as fast as possible
+        '-tl', '250', // 0 = as fast as possible
         '-t', '300000', // Restart every 5 min
         '-o', '-' // To stdout
     ]);
