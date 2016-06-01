@@ -15,6 +15,7 @@ senseState.centerColor = {hsl: {hue: 0.0, saturation: 0.0}, yuv: {y: 0, u: 0, v:
 senseState.targetColor = {hue: 0.056, saturation: 0.81};
 senseState.targets = [];
 senseState.edges = [];
+senseState.tooDark = [];
 
 function isEdge(ii, visionWidth, imgPixelSize, luma) {
     var val = luma[ii], compare, difference = 50;
@@ -91,16 +92,26 @@ function uvToSat(u, v) {
     return Math.sqrt(normalU * normalU + normalV * normalV);
 }
 
-function getCenterColor(y, u, v) {
+function getLumaFromUV(uvIndex) {
+    var pix = [];
+    pix[0] = rawYuv.y[uvIndex * 2];
+    pix[1] = rawYuv.y[uvIndex * 2 + 1];
+    pix[2] = rawYuv.y[uvIndex * 2 + 64];
+    pix[3] = rawYuv.y[uvIndex * 2 + 65];
+
+    return (pix[0] + pix[1] + pix[2] + pix[3]) / 4;
+}
+
+function getCenterColor(u, v) {
     var centerU = (u[367] + u[368] + u[399] + u[400]) / 4,
         centerV = (v[367] + v[368] + v[399] + v[400]) / 4,
-        centerY = (y[1536]);
+        centerY = (getLumaFromUV(367) + getLumaFromUV(368) + getLumaFromUV(399) + getLumaFromUV(400)) / 4;
 
     return [centerY, centerU, centerV];
 }
 
 function setCenterColor(rawYuv) {
-    var centerColor = getCenterColor(rawYuv.y, rawYuv.u, rawYuv.v);
+    var centerColor = getCenterColor(rawYuv.u, rawYuv.v);
 
     senseState.centerColor.yuv.y = centerColor[0];
     senseState.centerColor.yuv.u = centerColor[1];
@@ -108,23 +119,19 @@ function setCenterColor(rawYuv) {
 
     senseState.centerColor.hsl.hue = uvToHue(centerColor[1], centerColor[2]);
     senseState.centerColor.hsl.saturation = uvToSat(centerColor[1], centerColor[2]);
-}
-
-function getLumaFromUV(uvIndex) {
-    //
-    return 255;
+    senseState.centerColor.hsl.luma = centerColor[0] / 256;
 }
 
 function targetColorLocations(u, v, len) {
     var ii,
-        luma,
-        lumaTolerance = 50,
+        lumaTolerance = 20,
         hueTolerance = 0.03,
         satTolerance = 0.20,
         hueDif,
         satDif,
         hits = [];
 
+    senseState.tooDark.length = 0;
     for (ii = 0; ii < len; ii += 1) {
         // if luma is too dark, ignore
         if (getLumaFromUV(ii) > lumaTolerance) {
@@ -136,6 +143,8 @@ function targetColorLocations(u, v, len) {
             if (hueDif <= hueTolerance && satDif <= satTolerance) {
                 hits.push(ii);
             }
+        } else {
+            senseState.tooDark.push(ii);
         }
     }
 
@@ -190,7 +199,9 @@ function takePic() {
     cam = spawn('raspiyuv', [
         '-w', 64,
         '-h', 48,
-        '-p', '50, 80, 400, 300', // small preview window
+        //'-p', '50, 80, 400, 300', // small preview window
+        '--nopreview',
+        '-awb', 'fluorescent',
         '-bm', // Burst mode
         '-vf', // My camera is upside-down so flip the image vertically
         '-tl', '250', // 0 = as fast as possible

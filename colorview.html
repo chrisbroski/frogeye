@@ -1,5 +1,6 @@
 <!doctype html>
 <title>Color Detector</title>
+<link rel="icon" type="image/png"  href="img/favicon.png">
 <style>
 * {box-sizing: border-box; }
 h1, h3 {margin: 0.5em 0; font-weight: normal; }
@@ -76,45 +77,34 @@ function displayEdges(edges) {
 
 function displayTargets(hits) {
     ctxBall.clearRect(0, 0, canvasEdge.width, canvasEdge.height);
+    ctxBall.fillStyle = 'rgba(255, 0, 255, 0.5)';
 
     hits.forEach(function (hit) {
         var x = (hit % 32) * mag * 2,
             y = (Math.floor(hit / 32)) * mag * 2,
             size = mag * 2;
 
-        /*ctxEdge.beginPath();
-        gradient.addColorStop(0, 'black');
-        gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.15)');
-        gradient.addColorStop(1, 'transparent');
-        ctxEdge.arc(x, y, mag * 1.5, 0, 2 * Math.PI);
-
-        ctxEdge.fillStyle = gradient;
-        ctxEdge.fill();
-
-        x = (loc % 32) * 2;
-        y = Math.floor(loc / 32) * 2;*/
-
         ctxBall.beginPath();
-        //ctxBall.arc(x * mag, y * mag, 10, 0, Math.PI * 2, true);
         ctxBall.fillRect(x, y, size, size);
         ctxBall.closePath();
         ctxBall.fill();
     });
 }
 
-function displayBall(loc) {
-    var x, y;
-    ctxBall.clearRect(0, 0, canvasBall.width, canvasBall.height);
+function displayDark(tooDark) {
+    //ctxBall.clearRect(0, 0, canvasEdge.width, canvasEdge.height);
+    ctxBall.fillStyle = 'rgba(0, 0, 0, 0.5)';
 
-    if (loc > -1) {
-        x = (loc % 32) * 2;
-        y = Math.floor(loc / 32) * 2;
+    tooDark.forEach(function (dark) {
+        var x = (dark % 32) * mag * 2,
+            y = (Math.floor(dark / 32)) * mag * 2,
+            size = mag * 2;
 
         ctxBall.beginPath();
-        ctxBall.arc(x * mag, y * mag, 10, 0, Math.PI * 2, true);
+        ctxBall.fillRect(x, y, size, size);
         ctxBall.closePath();
         ctxBall.fill();
-    }
+    });
 }
 
 function displayColor(hsl) {
@@ -132,8 +122,8 @@ function senseStateReceived(senseState) {
     document.getElementById('senseState').innerHTML = jsonString;
 
     displayEdges(jsonState.edges);
-    //displayBall(jsonState.targetFound);
     displayTargets(jsonState.targets);
+    displayDark(jsonState.tooDark);
     displayColor(jsonState.centerColor.hsl);
     targetColor.h = jsonState.centerColor.hsl.hue;
     targetColor.s = jsonState.centerColor.hsl.saturation;
@@ -159,8 +149,6 @@ function init() {
 
     canvasBall = document.getElementById('ball');
     ctxBall = canvasBall.getContext("2d");
-    //ctxBall.strokeRect(30 * mag, 22 * mag, 4 * mag, 4 * mag);
-    ctxBall.fillStyle = 'rgba(255, 0, 255, 0.5)';
 
     socket.on('senseState', senseStateReceived);
     document.getElementById('setTarget').onclick = setTarget;
