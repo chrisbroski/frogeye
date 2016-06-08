@@ -108,10 +108,10 @@ function displayDark(tooDark) {
 }
 
 function displayColor(hsl) {
-    var hue = (hsl.hue * 360).toFixed(),
+    var hue = (hsl.hue).toFixed(),
         sat = (hsl.saturation * 100).toFixed();
 
-    hsl = 'hsl(' + hue + ', ' + sat + '%, 50%)';
+    hsl = 'hsl(' + hue + ', 100%, 50%)';
     document.querySelector('#colorInfo > div:first-child').style.background = hsl;
 }
 

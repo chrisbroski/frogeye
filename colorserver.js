@@ -81,8 +81,8 @@ function uvToHue(u, v) {
         angle = Math.PI * 2 + angle;
     }
 
-    // Then normalize the value to 0.0 - 1.0
-    return angle / (Math.PI * 2);
+    // Then normalize the value to 0.0 - 360.0
+    return angle / (Math.PI * 2) * 360;
 }
 
 function uvToSat(u, v) {
@@ -125,7 +125,7 @@ function setCenterColor(rawYuv) {
 function targetColorLocations(u, v, len) {
     var ii,
         lumaTolerance = 20,
-        hueTolerance = 0.03,
+        hueTolerance = 1.0,
         satTolerance = 0.20,
         hueDif,
         satDif,
@@ -136,8 +136,8 @@ function targetColorLocations(u, v, len) {
         // if luma is too dark, ignore
         if (getLumaFromUV(ii) > lumaTolerance) {
             hueDif = Math.abs(uvToHue(u[ii], v[ii]) - senseState.targetColor.hue);
-            if (hueDif > 0.5) {
-                hueDif = Math.abs(hueDif - 1.0);
+            if (hueDif > 180) {
+                hueDif = Math.abs(hueDif - 180);
             }
             satDif = Math.abs(uvToSat(u[ii], v[ii]) - senseState.targetColor.saturation);
             if (hueDif <= hueTolerance && satDif <= satTolerance) {

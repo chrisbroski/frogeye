@@ -60,7 +60,7 @@ function uvToHue(u, v) {
 
     // First, get u and v into the -1.0 to 1.0 range for some trig.
     var angle,
-        normalU = ((2 * u / 255) - 1.0) * -1,
+        normalU = (-2 * u / 255) + 1.0,
         normalV = (2 * v / 255) - 1.0;
 
     // atan2 is a super useful trig function to get an angle -pi to pi
