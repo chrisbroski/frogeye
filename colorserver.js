@@ -6,13 +6,16 @@ var app = require('express')(),
     spawn = require('child_process').spawn,
     port = 3790,
     senseState = {},
-    imgPixelSize = 64 * 48,
+    imgWidth = 128,
+    imgHeight = 96,
+    imgPixelSize = imgWidth * imgHeight,
     imgRawFileSize = imgPixelSize * 1.5,
     rawYuv = {y: [], u: [], v: []},
     partialImgData = '';
 
+senseState.dimensions = [imgWidth, imgHeight];
 senseState.centerColor = {hsl: {hue: 0.0, saturation: 0.0}, yuv: {y: 0, u: 0, v: 0}};
-senseState.targetColor = {hue: 0.056, saturation: 0.81};
+senseState.targetColor = {hue: 22, saturation: 0.57};
 senseState.targets = [];
 senseState.edges = [];
 senseState.tooDark = [];
@@ -96,16 +99,30 @@ function getLumaFromUV(uvIndex) {
     var pix = [];
     pix[0] = rawYuv.y[uvIndex * 2];
     pix[1] = rawYuv.y[uvIndex * 2 + 1];
-    pix[2] = rawYuv.y[uvIndex * 2 + 64];
-    pix[3] = rawYuv.y[uvIndex * 2 + 65];
+    pix[2] = rawYuv.y[uvIndex * 2 + imgWidth];
+    pix[3] = rawYuv.y[uvIndex * 2 + imgWidth + 1];
 
     return (pix[0] + pix[1] + pix[2] + pix[3]) / 4;
 }
 
+function centerPixels() {
+    var pix = [],
+        colorWidth = imgWidth / 2,
+        colorHeight = imgHeight / 2;
+
+    pix[0] = (colorHeight / 2) * colorWidth - (colorWidth / 2) - 1;
+    pix[1] = pix[0] + 1;
+    pix[2] = pix[0] + colorWidth;
+    pix[3] = pix[2] + 1;
+
+    return pix;
+}
+
 function getCenterColor(u, v) {
-    var centerU = (u[367] + u[368] + u[399] + u[400]) / 4,
-        centerV = (v[367] + v[368] + v[399] + v[400]) / 4,
-        centerY = (getLumaFromUV(367) + getLumaFromUV(368) + getLumaFromUV(399) + getLumaFromUV(400)) / 4;
+    var center = centerPixels(),
+        centerU = (u[center[0]] + u[center[1]] + u[center[2]] + u[center[3]]) / 4,
+        centerV = (v[center[0]] + v[center[1]] + v[center[2]] + v[center[3]]) / 4,
+        centerY = (getLumaFromUV(center[0]) + getLumaFromUV(center[1]) + getLumaFromUV(center[2]) + getLumaFromUV(center[3])) / 4;
 
     return [centerY, centerU, centerV];
 }
@@ -119,7 +136,7 @@ function setCenterColor(rawYuv) {
 
     senseState.centerColor.hsl.hue = uvToHue(centerColor[1], centerColor[2]);
     senseState.centerColor.hsl.saturation = uvToSat(centerColor[1], centerColor[2]);
-    senseState.centerColor.hsl.luma = centerColor[0] / 256;
+    senseState.centerColor.hsl.luma = centerColor[0] / 255;
 }
 
 function targetColorLocations(u, v, len) {
@@ -188,7 +205,7 @@ function convertImageData(imgData) {
 function processData(yuvData) {
     convertImageData(yuvData);
 
-    findEdges(rawYuv.y, imgPixelSize, 64, 20);
+    findEdges(rawYuv.y, imgPixelSize, imgWidth, 20);
     setCenterColor(rawYuv);
     targetColorLocations(rawYuv.u, rawYuv.v, imgPixelSize / 4);
 }
@@ -197,8 +214,8 @@ function takePic() {
     var cam;
 
     cam = spawn('raspiyuv', [
-        '-w', 64,
-        '-h', 48,
+        '-w', imgWidth,
+        '-h', imgHeight,
         //'-p', '50, 80, 400, 300', // small preview window
         '--nopreview',
         '-awb', 'fluorescent',
