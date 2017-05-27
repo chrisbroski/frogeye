@@ -96,8 +96,8 @@ function displayDark(tooDark) {
     ctxBall.fillStyle = 'rgba(0, 0, 0, 0.5)';
 
     tooDark.forEach(function (dark) {
-        var x = (dark % 32) * mag * 2,
-            y = (Math.floor(dark / 32)) * mag * 2,
+        var x = (dark % (width / 2)) * mag * 2,
+            y = (Math.floor(dark / (width / 2))) * mag * 2,
             size = mag * 2;
 
         ctxBall.beginPath();
@@ -109,10 +109,14 @@ function displayDark(tooDark) {
 
 function displayColor(hsl) {
     var hue = (hsl.hue).toFixed(),
-        sat = (hsl.saturation * 100).toFixed();
+        sat = (hsl.saturation * 100).toFixed(),
+        hslColor = 'hsl(' + hue + ', 100%, 50%)';;
 
-    hsl = 'hsl(' + hue + ', 100%, 50%)';
-    document.querySelector('#colorInfo > div:first-child').style.background = hsl;
+    if (hsl.luma < 0.02) {
+        hslColor = "#777";
+    }
+    document.querySelector('#colorInfo > div:first-child').style.background = hslColor;
+    document.querySelector('#setTarget').disabled = hsl.luma < 0.02;
 }
 
 function senseStateReceived(senseState) {
