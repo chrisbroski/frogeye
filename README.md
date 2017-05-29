@@ -29,7 +29,38 @@ The frog's brain didn't need to makes sense of the world at all. The intermediat
 
 This looks nothing like a neural net. Co-author Walter Pitts was arguably the father of neural networks. After the frog paper was published he burned all of his work and drank himself to death.
 
-## Implemented So Far
+## Running This Code on Your Own Pi
+
+First, set up your Raspberry Pi camera. The Node.js scripts will be using shell commands very similar to this:
+
+    raspiyuv -w 64 -h 48 -p '50, 80 400, 300' -bm -vf -tl 0 -t 300000 -o -
+
+Follow instructions to install and configure your camera module. If you can run that command on your Pi and see a bunch of data being spewed into the terminal, then your camera is ready for the Node script.
+
+You will also need to install Node.js. The only way I have found to reliably install Node.js on a Raspberry Pi is using the [n Node version manager](https://github.com/tj/n).
+
+The easiest way to install the scripts is to install Git, then clone this repository. To install the npm dependencies, run `npm install` in the repo's root directory. Then you can run it using `npm start`.
+
+Once the view server is running, you can view it from any computer commectied to your local network at the Raspberry Pi's IP address over port 3789. Your router should be able to tell you the Pi's address on your network, or use `ifconfig` and look for the `inet addr`. It is often something like `192.168.0.27`. Then just type this into your browser to see the results.
+
+    http://192.168.0.27:3789/
+
+## 4 Detector Types
+
+### Operation 1-Sustained Contrast Detectors
+
+Edge Detection    2°
+Bug Detector      7°
+Movement         12°
+Looming          15°
+
+### Operation 2-Net Convexity Detectors
+
+### Operation 3-Moving-Edge Detectors
+
+### Operation 4-Net Dimming Detectors
+
+<!--## Implemented So Far
 
 I decided to try to simulate on/off (movement) cells using a Raspberry Pi first. The file *[motion-overall.js](https://github.com/chrisbroski/frogeye/blob/master/motion-overall.js)* is a simple processor to measure total movement in the field of vision of a Pi camera.
 
@@ -86,6 +117,6 @@ I am using GitHub's Atom.io code editor on Mac to write the JavaScript. I recomm
 
 If you are curious about how much this visual processing in Node.js asks of your hardware resources, I checked. The *viewserver.js* process (which imports *Senses.js* which imports *frogeye.js*) puts my Raspberry Pi 2 at about 4.0% Cpu with negligible RAM usage. This is at a time lapse camera setting of 0 (take pictures as fast as possible, minimum 30ms) and sending sense data to the client every 20ms (50 times per second.) Here's the top output if you don't believe me.
 
-<img src="img/topfrogeye.png" alt"Top output of viewserver.js">
+<img src="img/topfrogeye.png" alt="Top output of viewserver.js">
 
-The view client runs on a different machine so its usage is not reflected in the above data.
+The view client runs on a different machine so its usage is not reflected in the above data.-->
