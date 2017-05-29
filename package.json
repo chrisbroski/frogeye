@@ -2,14 +2,13 @@
   "name": "frogeye",
   "version": "1.0.0",
   "description": "",
-  "main": "viewserver.js",
+  "main": "eye.js",
   "dependencies": {
-    "express": "^4.15.3",
     "socket.io": "^1.7.4"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node viewserver.js",
+    "start": "node eye.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
