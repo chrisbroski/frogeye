@@ -49,14 +49,26 @@ Once the view server is running, you can view it from any computer commectied to
 
 ### Operation 1-Sustained Contrast Detectors
 
-Edge Detection    2°
-Bug Detector      7°
-Movement         12°
-Looming          15°
+Each detector in a frog's retina has a different resolution depending on its type. The size of its receptive field is described in approximate degrees of the field of view.
+
+    Edge        2°
+    Bug         7°
+    Movement   12°
+    Looming    15°
+
+Edge detection is the most fine-grained of these receptors. For simplicity I am getting raw image data 64x48 pixels so we'll make edges' receptive field equal to one pixel. I am making the first version a simplification that gives good results. In the `frogeye.isEdge` method I check every pixel to see if any one of its 4 adjacent pixels are significantly brighter. I am using a flat value of 50 luma (of possible values 0 - 255) as the indicator of significant brightness difference. This is a simple way to detect contrast differences, but has some issues.
+
+One bug is that edges very close to 50 luma will flicker due to normal light intensity fluctuations in the camera.
+
+The biggest difference in the behavior of this algorithm and the retinal cells it means to emulate is that those cells will persist firing when light is removed. I hope to change the logic to persist the edge image, and maybe it will also fix my flickering issue.
 
 ### Operation 2-Net Convexity Detectors
 
+Still working on this one. It will probably take the output of both the edge and movement detectors, plus check alpha-shape.
+
 ### Operation 3-Moving-Edge Detectors
+
+I am going to write this to accept the output of multiple edge detectors.
 
 ### Operation 4-Net Dimming Detectors
 
