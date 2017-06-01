@@ -33,15 +33,15 @@ This looks nothing like a neural net. Co-author Walter Pitts was arguably the fa
 
 First, set up your Raspberry Pi camera. The Node.js scripts will be using shell commands very similar to this:
 
-    raspiyuv -w 64 -h 48 -p '50, 80 400, 300' -bm -vf -tl 0 -t 300000 -o -
+    raspiyuv -w 64 -h 48 -bm -tl 0 -o -
 
 Follow instructions to install and configure your camera module. If you can run that command on your Pi and see a bunch of data being spewed into the terminal, then your camera is ready for the Node script.
 
 You will also need to install Node.js. The only way I have found to reliably install Node.js on a Raspberry Pi is using the [n Node version manager](https://github.com/tj/n).
 
-The easiest way to install the scripts is to install Git, then clone this repository. To install the npm dependencies, run `npm install` in the repo's root directory. Then you can run it using `npm start`.
+The easiest way to install the scripts is to install [Git](https://git-scm.com/), then clone this repository. To install the npm dependencies, run `npm install` in the repo's root directory. Then you can run it using `npm start`.
 
-Once the view server is running, you can view it from any computer commectied to your local network at the Raspberry Pi's IP address over port 3789. Your router should be able to tell you the Pi's address on your network, or use `ifconfig` and look for the `inet addr`. It is often something like `192.168.0.27`. Then just type this into your browser to see the results.
+Once the view server is running, you can view it from any computer commectied to your local network at the Raspberry Pi's IP address over port 3789. Your router should be able to tell you the Pi's address on your network, or use `ifconfig` and look for the `inet addr`. It is often something like `192.168.0.27`. Then just navigate to this in your browser to see the results.
 
     http://192.168.0.27:3789/
 
