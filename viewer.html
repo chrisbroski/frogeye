@@ -99,8 +99,8 @@ function displayEdges(edges) {
     ctxEdge.clearRect(0, 0, canvasEdge.width, canvasEdge.height);
 
     edges.forEach(function (edge) {
-        var x = (edge % 64) * mag,
-            y = (Math.floor(edge / 64)) * mag,
+        var x = (edge % viewWidth) * mag,
+            y = (Math.floor(edge / viewWidth)) * mag,
             gradient = ctxEdge.createRadialGradient(x, y, 0, x, y, mag * 1.5);
 
         ctxEdge.beginPath();

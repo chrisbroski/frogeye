@@ -1,11 +1,12 @@
 /*jslint node: true */
 
-function Senses(visionWidth, visionHeight) {
+function Senses(visionWidth, visionHeight, virtual) {
     'use strict';
 
     // Import libraries
     var spawn = require('child_process').spawn,
         frogeye = require('./frogeye.js'),
+        fs = require("fs"),
 
         // Declare private objects
         state = {},
@@ -112,31 +113,42 @@ function Senses(visionWidth, visionHeight) {
             imgRawFileSize = imgPixelSize * 1.5,
             cam;
 
-        timeLapseInterval = timeLapseInterval || 0;
-        cam = spawn('raspiyuv', [
-            '-w', visionWidth.toString(10),
-            '-h', visionHeight.toString(10),
-            '-p', '50, 80, 400, 300', // small preview window
-            '-bm', // Burst mode
-            '-vf', // My camera is upside-down so flip the image vertically
-            '-tl', timeLapseInterval.toString(10), // 0 = as fast as possible
-            '-t', '300000', // Restart every 5 min
-            '-o', '-' // To stdout
-        ]);
+        if (virtual) {
+            fs.readFile(__dirname + '/test2.raw', function (err, data) {
+                if (err) {
+                    throw err;
+                }
+                observers.vision(data, imgRawFileSize, imgPixelSize);
+            });
+        } else {
+            timeLapseInterval = timeLapseInterval || 0;
+            cam = spawn('raspiyuv', [
+                '-w', visionWidth.toString(10),
+                '-h', visionHeight.toString(10),
+                //'-p', '50, 80, 400, 300', // small preview window
+                '--nopreview',
+                '-bm', // Burst mode
+                '-vf', // My camera is upside-down so flip the image vertically
+                '-hf',
+                '-tl', timeLapseInterval.toString(10), // 0 = as fast as possible
+                '-t', '300000', // Restart every 5 min
+                '-o', '-' // To stdout
+            ]);
 
-        cam.stdout.on('data', function (data) {
-            observers.vision(data, imgRawFileSize, imgPixelSize);
-        });
+            cam.stdout.on('data', function (data) {
+                observers.vision(data, imgRawFileSize, imgPixelSize);
+            });
 
-        cam.stderr.on('data', function (data) {
-            console.log('stderr: ' + data);
-        });
+            cam.stderr.on('data', function (data) {
+                console.log('stderr: ' + data);
+            });
 
-        cam.on('exit', function (code) {
-            console.log('raspiyuv process exited with code ' + code);
-            console.log('Restarting raspiyuv time lapse');
-            attention.look();
-        });
+            cam.on('exit', function (code) {
+                console.log('raspiyuv process exited with code ' + code);
+                console.log('Restarting raspiyuv time lapse');
+                attention.look();
+            });
+        }
     };
 
     function init() {

@@ -6,7 +6,7 @@ var server = http.createServer(app);
 var io = require('socket.io')(server);
 var port = 3789;
 var Senses = require('./Senses.js');
-var senses = new Senses(64, 48);
+var senses = new Senses(64, 48, !!process.argv[2]);
 
 function app(req, rsp) {
     if (req.url === "/img/favicon.png") {
