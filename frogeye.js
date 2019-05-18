@@ -107,13 +107,6 @@ function lumaProcess(luma, len, visionWidth, changeAmount) {
     };
 }
 
-function centerColor(chroma) {
-    var centerU = (chroma.U[367] + chroma.U[368] + chroma.U[399] + chroma.U[400]) / 4,
-        centerV = (chroma.V[367] + chroma.V[368] + chroma.V[399] + chroma.V[400]) / 4;
-
-    return [uvToHue(centerU, centerV), uvToSat(centerU, centerV)];
-}
-
 function targetColorLocation(chroma, len) {
     var ii,
         hue,
@@ -142,9 +135,9 @@ function frogeye(luma, chroma, imgPixelSize, visionWidth, changeAmount) {
     return {
         "brightness": bwData.brightness,
         "moveLocation": bwData.moveLocation,
-        "edges": bwData.edges,
-        "centerColor": centerColor(chroma),
-        "ball": targetColorLocation(chroma, imgPixelSize / 4)
+        "edges": bwData.edges//,
+        //"centerColor": centerColor(chroma),
+        //"ball": targetColorLocation(chroma, imgPixelSize / 4)
     };
 }
 

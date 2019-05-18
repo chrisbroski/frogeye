@@ -22,10 +22,6 @@ function Senses(visionWidth, visionHeight, virtual) {
         luma: {
             current: [],
             previous: []
-        },
-        chroma: {
-            U: [],
-            V: []
         }
     };
 
@@ -35,8 +31,6 @@ function Senses(visionWidth, visionHeight, virtual) {
         dimensions: [visionWidth, visionHeight],
         motionLocation: [],
         brightnessOverall: 0.0,
-        centerColor: {"hue": 0, "saturation": 0},
-        ball: -1,
         edges: []
     };
 
@@ -54,28 +48,21 @@ function Senses(visionWidth, visionHeight, virtual) {
         state.perceptions.brightnessOverall = frogView.brightness;
         state.perceptions.motionLocation = frogView.moveLocation;
         state.perceptions.edges = frogView.edges;
-        state.perceptions.centerColor.hue = frogView.centerColor[0];
-        state.perceptions.centerColor.saturation = frogView.centerColor[1];
-        state.perceptions.ball = frogView.ball;
     };
 
     // *Observers* populate raw sense state from a creature's sensors.
     observers.vision = function (yuvData, imgRawFileSize, imgPixelSize) {
         var lumaData = [],
-            chromaU = [],
-            chromaV = [],
             ii;
 
         // The Pi camera gives a lot of crap data in yuv time lapse mode.
         // This is an attempt to recover some of it
         if (yuvData.length < imgRawFileSize - 1) {
-            //console.log('Partial img data chunk: ' + yuvData.length);
             if (yuvData.length + partialImgData.length === imgRawFileSize) {
                 yuvData = Buffer.concat([partialImgData, yuvData], imgRawFileSize);
             } else {
                 partialImgData = yuvData;
                 return;
-                //console.log('Reassembled partial data.');
             }
         }
         partialImgData = '';
@@ -84,18 +71,10 @@ function Senses(visionWidth, visionHeight, virtual) {
         for (ii = 0; ii < imgPixelSize; ii += 1) {
             lumaData.push(yuvData.readUInt8(ii));
         }
-        for (ii = imgPixelSize; ii < imgPixelSize * 1.25; ii += 1) {
-            chromaU.push(yuvData.readUInt8(ii));
-        }
-        for (ii = imgPixelSize * 1.25; ii < imgPixelSize * 1.5; ii += 1) {
-            chromaV.push(yuvData.readUInt8(ii));
-        }
 
         // Set raw global sense state
         state.raw.luma.previous = state.raw.luma.current;
         state.raw.luma.current = lumaData;
-        state.raw.chroma.U = chromaU;
-        state.raw.chroma.V = chromaV;
 
         /*
         Perceivers should typically be handled by the attention object, but for simplicity
@@ -106,6 +85,20 @@ function Senses(visionWidth, visionHeight, virtual) {
 
     // Other observers can be added here for sound, temperature, velocity, smell, whatever.
 
+    // virtual input
+    function virt(imgNum, imgRawFileSize, imgPixelSize) {
+        var img = parseInt(imgNum / 10, 10) % 2 + 1;
+        imgNum += 1;
+
+        fs.readFile(__dirname + '/test' + img + '.raw', function (err, data) {
+            if (err) {
+                throw err;
+            }
+            observers.vision(data, imgRawFileSize, imgPixelSize);
+            setTimeout(function () {virt(imgNum, imgRawFileSize, imgPixelSize); }, 250);
+        });
+    }
+
     // *Attention* is responsible for triggering observers and perceivers.
     attention = {};
     attention.look = function (timeLapseInterval) {
@@ -114,18 +107,12 @@ function Senses(visionWidth, visionHeight, virtual) {
             cam;
 
         if (virtual) {
-            fs.readFile(__dirname + '/test2.raw', function (err, data) {
-                if (err) {
-                    throw err;
-                }
-                observers.vision(data, imgRawFileSize, imgPixelSize);
-            });
+            virt(1, imgRawFileSize, imgPixelSize);
         } else {
             timeLapseInterval = timeLapseInterval || 0;
             cam = spawn('raspiyuv', [
                 '-w', visionWidth.toString(10),
                 '-h', visionHeight.toString(10),
-                //'-p', '50, 80, 400, 300', // small preview window
                 '--nopreview',
                 '-bm', // Burst mode
                 '-vf', // My camera is upside-down so flip the image vertically
